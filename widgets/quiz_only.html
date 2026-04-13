@@ -169,7 +169,7 @@ function render(){
   var n=(cur+1).toString().padStart(2,'0');
   document.getElementById('q-num').textContent='Q '+n;
   document.getElementById('q-text').textContent=q.t;
-  document.getElementById('q-rev').textContent=q.rev?'⚠ 해당하면 0점 처리':'';
+  document.getElementById('q-rev').textContent='';
   document.getElementById('q-counter').textContent=(cur+1)+' / '+qs.length;
   document.getElementById('q-bar').style.width=((cur+1)/qs.length*100)+'%';
 }
