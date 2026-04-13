@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>24시간 타임 영수증</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap');
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Noto Sans KR',sans-serif;background:#f5f5f7;min-height:100vh;display:flex;align-items:flex-start;justify-content:center;padding:24px 16px 48px}
+  .card{background:#fff;border-radius:24px;width:100%;max-width:480px;padding:28px 24px;box-shadow:0 4px 24px rgba(0,0,0,.08)}
+
+  .header{text-align:center;margin-bottom:24px}
+  .badge{display:inline-block;background:#FEF3C7;color:#92400E;font-size:11px;font-weight:700;letter-spacing:.08em;padding:5px 12px;border-radius:20px;margin-bottom:12px}
+  .header h1{font-size:20px;font-weight:700;color:#111;margin-bottom:6px}
+  .header p{font-size:13px;color:#888;line-height:1.5}
+
+  .r-row{display:flex;align-items:center;gap:12px;padding:11px 0;border-bottom:1px solid #F3F4F6}
+  .r-row:last-child{border-bottom:none}
+  .r-icon{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+  .r-label{flex:1}
+  .r-label .name{font-size:14px;font-weight:500;color:#222}
+  .r-label .sub{font-size:11px;color:#aaa;margin-top:2px}
+  .r-input-wrap{display:flex;align-items:center;gap:5px}
+  .r-input{width:56px;text-align:right;font-size:15px;font-weight:500;padding:7px 8px;border:1.5px solid #E5E7EB;border-radius:10px;color:#222;font-family:'Noto Sans KR',sans-serif;background:#fff}
+  .r-input:focus{outline:none;border-color:#F59E0B}
+  .r-unit{font-size:13px;color:#aaa}
+  .thief-section{background:#FFFBEB;border-radius:14px;padding:4px 12px;margin:8px 0}
+  .thief-label{font-size:10px;font-weight:700;color:#D97706;letter-spacing:.07em;padding-top:10px;margin-bottom:2px}
+
+  .calc-btn{width:100%;margin-top:20px;padding:15px;border-radius:14px;border:none;background:#F59E0B;color:#fff;font-size:16px;font-weight:700;cursor:pointer;font-family:'Noto Sans KR',sans-serif;transition:background .15s,transform .1s;box-shadow:0 4px 12px rgba(245,158,11,.3)}
+  .calc-btn:hover{background:#D97706}
+  .calc-btn:active{transform:scale(.97)}
+
+  .total-disp{text-align:center;font-size:13px;color:#aaa;margin-top:10px}
+  .total-disp span{color:#F59E0B;font-weight:700}
+
+  .result{display:none;margin-top:24px}
+  .result.show{display:block}
+
+  .stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px}
+  .stat-card{border-radius:14px;padding:14px}
+  .stat-card .sc-label{font-size:11px;font-weight:700;letter-spacing:.05em;margin-bottom:6px}
+  .stat-card .sc-val{font-size:24px;font-weight:700;line-height:1}
+  .stat-card .sc-sub{font-size:11px;margin-top:4px}
+  .sc-growth{background:#ECFDF5;}.sc-growth .sc-label{color:#065F46}.sc-growth .sc-val{color:#059669}.sc-growth .sc-sub{color:#6EE7B7}
+  .sc-thief{background:#FFF7ED;}.sc-thief .sc-label{color:#92400E}.sc-thief .sc-val{color:#F59E0B}.sc-thief .sc-sub{color:#FCD34D}
+
+  .bar-wrap{margin-bottom:6px}
+  .bar-track{height:10px;background:#F3F4F6;border-radius:5px;overflow:hidden;display:flex}
+  .bar-seg{height:10px;transition:width .5s cubic-bezier(.4,0,.2,1)}
+  .bar-legend{display:flex;gap:14px;margin-top:8px;margin-bottom:20px}
+  .bl{display:flex;align-items:center;gap:5px;font-size:11px;color:#888}
+  .bl-dot{width:8px;height:8px;border-radius:2px}
+
+  .comment-box{border-radius:14px;padding:16px;margin-bottom:16px}
+  .comment-box .cb-label{font-size:11px;font-weight:700;letter-spacing:.06em;margin-bottom:6px}
+  .comment-box p{font-size:14px;line-height:1.75}
+  .cb-warn{background:#FFF7ED}.cb-warn .cb-label{color:#D97706}.cb-warn p{color:#92400E}
+  .cb-ok{background:#ECFDF5}.cb-ok .cb-label{color:#065F46}.cb-ok p{color:#064E3B}
+
+  .year-section{margin-bottom:20px}
+  .year-section .ys-title{font-size:12px;font-weight:700;color:#888;letter-spacing:.06em;margin-bottom:10px}
+  .year-table{width:100%;border-collapse:collapse;font-size:13px}
+  .year-table th{text-align:left;padding:9px 10px;background:#F8F8F8;color:#888;font-size:11px;font-weight:700;letter-spacing:.05em}
+  .year-table th:first-child{border-radius:8px 0 0 8px}
+  .year-table th:last-child{border-radius:0 8px 8px 0}
+  .year-table td{padding:10px 10px;border-bottom:1px solid #F3F4F6;color:#333;vertical-align:middle}
+  .year-table tr:last-child td{border-bottom:none}
+  .year-table tr.my-row td{background:#FFF7ED;font-weight:700;color:#D97706}
+  .year-table tr.my-row td:first-child{border-left:3px solid #F59E0B}
+
+  .retry-btn{width:100%;padding:13px;border-radius:14px;border:1.5px solid #E5E7EB;background:#fff;font-size:14px;font-weight:600;color:#888;cursor:pointer;font-family:'Noto Sans KR',sans-serif;transition:border-color .15s,color .15s}
+  .retry-btn:hover{border-color:#F59E0B;color:#D97706}
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="header">
+    <div class="badge">DoDream 3주차 활동</div>
+    <h1>나의 24시간 타임 영수증</h1>
+    <p>어제 하루 보낸 시간을 솔직하게 입력해보세요</p>
+  </div>
+
+  <div class="r-row">
+    <div class="r-icon" style="background:#EFF6FF">😴</div>
+    <div class="r-label"><div class="name">수면</div><div class="sub">밤잠 + 낮잠 포함</div></div>
+    <div class="r-input-wrap"><input class="r-input" type="number" min="0" max="24" step="0.5" value="" placeholder="0" id="i0" oninput="updateTotal()"><span class="r-unit">h</span></div>
+  </div>
+  <div class="r-row">
+    <div class="r-icon" style="background:#F0FDF4">🍚</div>
+    <div class="r-label"><div class="name">식사</div><div class="sub">아침·점심·저녁 합산</div></div>
+    <div class="r-input-wrap"><input class="r-input" type="number" min="0" max="24" step="0.5" value="" placeholder="0" id="i1" oninput="updateTotal()"><span class="r-unit">h</span></div>
+  </div>
+  <div class="r-row">
+    <div class="r-icon" style="background:#F0FDF4">🚌</div>
+    <div class="r-label"><div class="name">이동</div><div class="sub">통학·이동 시간 합산</div></div>
+    <div class="r-input-wrap"><input class="r-input" type="number" min="0" max="24" step="0.5" value="" placeholder="0" id="i2" oninput="updateTotal()"><span class="r-unit">h</span></div>
+  </div>
+  <div class="r-row">
+    <div class="r-icon" style="background:#EEF2FF">📚</div>
+    <div class="r-label"><div class="name">수업·강의</div><div class="sub">오늘 실제 수업 시간</div></div>
+    <div class="r-input-wrap"><input class="r-input" type="number" min="0" max="24" step="0.5" value="" placeholder="0" id="i3" oninput="updateTotal()"><span class="r-unit">h</span></div>
+  </div>
+  <div class="r-row">
+    <div class="r-icon" style="background:#EEF2FF">✏️</div>
+    <div class="r-label"><div class="name">공부·과제</div><div class="sub">수업 외 자습 시간</div></div>
+    <div class="r-input-wrap"><input class="r-input" type="number" min="0" max="24" step="0.5" value="" placeholder="0" id="i4" oninput="updateTotal()"><span class="r-unit">h</span></div>
+  </div>
+
+  <div class="thief-section">
+    <div class="thief-label">⚡ 시간 도둑 구역</div>
+    <div class="r-row">
+      <div class="r-icon" style="background:#FEF3C7">📱</div>
+      <div class="r-label"><div class="name">스마트폰</div><div class="sub">스크린타임에서 확인!</div></div>
+      <div class="r-input-wrap"><input class="r-input" type="number" min="0" max="24" step="0.5" value="" placeholder="0" id="i5" oninput="updateTotal()"><span class="r-unit">h</span></div>
+    </div>
+    <div class="r-row">
+      <div class="r-icon" style="background:#FEF3C7">📺</div>
+      <div class="r-label"><div class="name">유튜브·넷플릭스</div><div class="sub">시간 도둑 2호</div></div>
+      <div class="r-input-wrap"><input class="r-input" type="number" min="0" max="24" step="0.5" value="" placeholder="0" id="i6" oninput="updateTotal()"><span class="r-unit">h</span></div>
+    </div>
+  </div>
+
+  <div class="r-row">
+    <div class="r-icon" style="background:#F0FDF4">🏃</div>
+    <div class="r-label"><div class="name">운동</div><div class="sub">산책·헬스 합산</div></div>
+    <div class="r-input-wrap"><input class="r-input" type="number" min="0" max="24" step="0.5" value="" placeholder="0" id="i7" oninput="updateTotal()"><span class="r-unit">h</span></div>
+  </div>
+  <div class="r-row">
+    <div class="r-icon" style="background:#F9FAFB">☁️</div>
+    <div class="r-label"><div class="name">멍때리기·휴식</div><div class="sub">그냥 쉰 시간</div></div>
+    <div class="r-input-wrap"><input class="r-input" type="number" min="0" max="24" step="0.5" value="" placeholder="0" id="i8" oninput="updateTotal()"><span class="r-unit">h</span></div>
+  </div>
+  <div class="r-row">
+    <div class="r-icon" style="background:#F9FAFB">💬</div>
+    <div class="r-label"><div class="name">기타</div><div class="sub">약속·알바 등</div></div>
+    <div class="r-input-wrap"><input class="r-input" type="number" min="0" max="24" step="0.5" value="" placeholder="0" id="i9" oninput="updateTotal()"><span class="r-unit">h</span></div>
+  </div>
+
+  <div class="total-disp">합계: <span id="total-disp">0</span> / 24시간</div>
+  <button class="calc-btn" onclick="showResult()">영수증 정산하기</button>
+
+  <div class="result" id="result">
+    <div class="stat-grid">
+      <div class="stat-card sc-growth">
+        <div class="sc-label">성장 시간</div>
+        <div class="sc-val" id="r-growth">0<span style="font-size:14px">h</span></div>
+        <div class="sc-sub">수업 + 공부 + 운동</div>
+      </div>
+      <div class="stat-card sc-thief">
+        <div class="sc-label">시간 도둑</div>
+        <div class="sc-val" id="r-thief">0<span style="font-size:14px">h</span></div>
+        <div class="sc-sub">폰 + 유튜브</div>
+      </div>
+    </div>
+
+    <div class="bar-wrap">
+      <div class="bar-track">
+        <div class="bar-seg" id="bar-g" style="background:#34D399;width:0%"></div>
+        <div class="bar-seg" id="bar-t" style="background:#FBBF24;width:0%"></div>
+        <div class="bar-seg" id="bar-o" style="background:#E5E7EB;width:100%"></div>
+      </div>
+    </div>
+    <div class="bar-legend">
+      <div class="bl"><div class="bl-dot" style="background:#34D399"></div>성장</div>
+      <div class="bl"><div class="bl-dot" style="background:#FBBF24"></div>시간 도둑</div>
+      <div class="bl"><div class="bl-dot" style="background:#E5E7EB"></div>기타</div>
+    </div>
+
+    <div class="comment-box" id="r-comment-box">
+      <div class="cb-label" id="r-comment-label"></div>
+      <p id="r-comment"></p>
+    </div>
+
+    <div class="year-section">
+      <div class="ys-title">시간 도둑 — 1년 환산표</div>
+      <table class="year-table">
+        <thead><tr><th>하루 시간 도둑</th><th>1년이면</th><th>할 수 있는 것</th></tr></thead>
+        <tbody>
+          <tr><td>1시간</td><td>365h</td><td>토익 기초 완성</td></tr>
+          <tr><td>2시간</td><td>730h</td><td>자격증 2개 도전</td></tr>
+          <tr><td>3시간</td><td>1,095h</td><td>토익 700점대 가능</td></tr>
+          <tr><td>4시간 이상</td><td>1,460h+</td><td>전문 기술 하나 마스터</td></tr>
+          <tr class="my-row"><td id="my-h">내 시간</td><td id="my-year">-</td><td id="my-can">-</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <button class="retry-btn" onclick="restart()">다시 입력하기</button>
+  </div>
+</div>
+
+<script>
+function getV(){return[0,1,2,3,4,5,6,7,8,9].map(function(i){return parseFloat(document.getElementById('i'+i).value)||0});}
+function updateTotal(){
+  var t=getV().reduce(function(a,b){return a+b},0);
+  document.getElementById('total-disp').textContent=t.toFixed(1);
+}
+function showResult(){
+  var v=getV();
+  var total=v.reduce(function(a,b){return a+b},0);
+  var growth=v[3]+v[4]+v[7];
+  var thief=v[5]+v[6];
+  var yearH=Math.round(thief*365);
+  document.getElementById('r-growth').innerHTML=growth.toFixed(1)+'<span style="font-size:14px">h</span>';
+  document.getElementById('r-thief').innerHTML=thief.toFixed(1)+'<span style="font-size:14px">h</span>';
+  var gp=total>0?Math.round(growth/24*100):0;
+  var tp=total>0?Math.round(thief/24*100):0;
+  var op=Math.max(0,100-gp-tp);
+  document.getElementById('bar-g').style.width=gp+'%';
+  document.getElementById('bar-t').style.width=tp+'%';
+  document.getElementById('bar-o').style.width=op+'%';
+  var cb=document.getElementById('r-comment-box');
+  var label=document.getElementById('r-comment-label');
+  var msg=document.getElementById('r-comment');
+  if(thief>=5){
+    cb.className='comment-box cb-warn';
+    label.textContent='시간 도둑 경보!';
+    msg.textContent='하루 '+thief.toFixed(1)+'시간이 스마트폰·유튜브로 빠져나가고 있어요. 1년이면 '+yearH+'시간 — 자격증 여러 개를 딸 수 있는 시간입니다. 딱 1시간만 줄여봐요.';
+  }else if(thief>=2){
+    cb.className='comment-box cb-warn';
+    label.textContent='시간 도둑 주의!';
+    msg.textContent='하루 '+thief.toFixed(1)+'시간, 나쁘지 않지만 조금만 줄이면 큰 차이가 납니다. 골든타임에 가장 중요한 일을 먼저 배치해보세요.';
+  }else{
+    cb.className='comment-box cb-ok';
+    label.textContent='시간 관리 우수!';
+    msg.textContent='스마트폰·유튜브 시간이 '+thief.toFixed(1)+'시간으로 잘 관리되고 있어요. 이제 성장 시간('+growth.toFixed(1)+'h)을 골든타임에 집중 배치해보세요.';
+  }
+  var myCan=yearH>=1460?'전문 기술 하나 마스터':yearH>=1095?'토익 700점대 + 자격증':yearH>=730?'자격증 2개 도전 가능':yearH>=365?'토익 기초 완성 가능':'관리 잘 되고 있어요';
+  document.getElementById('my-h').textContent='나: '+thief.toFixed(1)+'h';
+  document.getElementById('my-year').textContent=yearH+'h';
+  document.getElementById('my-can').textContent=myCan;
+  document.getElementById('result').classList.add('show');
+  document.getElementById('result').scrollIntoView({behavior:'smooth',block:'start'});
+}
+function restart(){
+  [0,1,2,3,4,5,6,7,8,9].forEach(function(i){document.getElementById('i'+i).value='';});
+  document.getElementById('total-disp').textContent='0';
+  document.getElementById('result').classList.remove('show');
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+</script>
+</body>
+</html>
