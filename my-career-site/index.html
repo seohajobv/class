@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>서하쌤의 진로취업 도구 모음</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #f8f7f4;
+      --surface: #ffffff;
+      --border: rgba(0,0,0,0.1);
+      --text: #1a1a18;
+      --muted: #6b6b67;
+      --purple: #534AB7;
+      --purple-light: #EEEDFE;
+      --teal: #0F6E56;
+      --teal-light: #E1F5EE;
+      --amber: #854F0B;
+      --amber-light: #FAEEDA;
+      --coral: #993C1D;
+      --coral-light: #FAECE7;
+      --radius: 12px;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+    }
+
+    /* ── 헤더 ── */
+    header {
+      background: var(--surface);
+      border-bottom: 0.5px solid var(--border);
+      padding: 2rem 2rem 1.5rem;
+      max-width: 960px;
+      margin: 0 auto;
+    }
+    .badge-row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 10px; }
+    .badge {
+      font-size: 11px; padding: 3px 10px;
+      border-radius: 20px; background: var(--purple-light);
+      color: var(--purple); font-weight: 500;
+    }
+    header h1 { font-size: 24px; font-weight: 600; margin-bottom: 6px; }
+    header p  { font-size: 14px; color: var(--muted); }
+
+    /* ── 통계 바 ── */
+    .stats {
+      max-width: 960px; margin: 0 auto;
+      display: grid; grid-template-columns: repeat(3, 1fr);
+      gap: 12px; padding: 1.2rem 2rem;
+    }
+    .stat {
+      background: #f0eeea; border-radius: 8px;
+      padding: 0.8rem 1rem; text-align: center;
+    }
+    .stat .num { font-size: 20px; font-weight: 600; }
+    .stat .lbl { font-size: 11px; color: var(--muted); margin-top: 2px; }
+
+    /* ── 메인 그리드 ── */
+    main {
+      max-width: 960px; margin: 0 auto;
+      padding: 0 2rem 3rem;
+    }
+    .section-label {
+      font-size: 11px; font-weight: 600; color: var(--muted);
+      letter-spacing: 0.07em; text-transform: uppercase;
+      margin: 1.5rem 0 0.8rem;
+    }
+    .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
+
+    /* ── 위젯 카드 ── */
+    .widget-card {
+      background: var(--surface);
+      border: 0.5px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.2rem;
+      display: flex; flex-direction: column; gap: 10px;
+    }
+    .widget-card.featured { border: 1.5px solid #CECBF6; }
+
+    .card-header { display: flex; align-items: center; gap: 10px; }
+    .card-icon {
+      width: 36px; height: 36px; border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px; flex-shrink: 0;
+    }
+    .icon-purple { background: var(--purple-light); }
+    .icon-teal   { background: var(--teal-light); }
+    .icon-amber  { background: var(--amber-light); }
+    .icon-coral  { background: var(--coral-light); }
+
+    .card-title  { font-size: 14px; font-weight: 600; }
+    .card-desc   { font-size: 12px; color: var(--muted); line-height: 1.5; }
+
+    .tag-row { display: flex; gap: 6px; flex-wrap: wrap; }
+    .tag {
+      font-size: 10px; padding: 2px 8px;
+      border-radius: 20px; border: 0.5px solid var(--border);
+      color: var(--muted);
+    }
+
+    /* ── iframe 위젯 컨테이너 ── */
+    .widget-frame {
+      width: 100%; border: none;
+      border-radius: 8px; background: var(--bg);
+      min-height: 120px;
+    }
+
+    /* ── 접기/펼치기 버튼 ── */
+    .toggle-btn {
+      font-size: 12px; color: var(--muted);
+      background: none; border: 0.5px solid var(--border);
+      border-radius: 6px; padding: 5px 12px;
+      cursor: pointer; align-self: flex-start;
+      transition: background 0.1s;
+    }
+    .toggle-btn:hover { background: var(--bg); }
+
+    /* ── 준비 중 ── */
+    .coming { opacity: 0.45; pointer-events: none; }
+
+    /* ── 반응형 ── */
+    @media (max-width: 640px) {
+      .grid { grid-template-columns: 1fr; }
+      .stats { grid-template-columns: repeat(3, 1fr); }
+      header, main { padding-left: 1rem; padding-right: 1rem; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ===== 헤더 ===== -->
+<header>
+  <div class="badge-row">
+    <span class="badge">대학 진로수업</span>
+    <span class="badge">취업센터</span>
+  </div>
+  <h1>서하쌤의 진로취업 도구 모음</h1>
+  <p>수강생이 직접 활용하는 AI 기반 진로·취업 인터랙티브 위젯</p>
+</header>
+
+<!-- ===== 통계 ===== -->
+<div class="stats">
+  <div class="stat"><div class="num">4</div><div class="lbl">위젯</div></div>
+  <div class="stat"><div class="num">AI</div><div class="lbl">기반 분석</div></div>
+  <div class="stat"><div class="num">무료</div><div class="lbl">수강생 개방</div></div>
+</div>
+
+<!-- ===== 메인 ===== -->
+<main>
+  <div class="section-label">핵심 위젯 4종</div>
+  <div class="grid">
+
+    <!-- ① 강점·역량 진단 -->
+    <div class="widget-card featured">
+      <div class="card-header">
+        <div class="card-icon icon-purple">💎</div>
+        <div>
+          <div class="card-title">강점·역량 진단</div>
+        </div>
+      </div>
+      <div class="card-desc">홀랜드 유형 + 직업가치관 기반 자기분석. AI가 결과를 시각화하여 강점을 발견합니다.</div>
+      <div class="tag-row">
+        <span class="tag">AI 분석</span>
+        <span class="tag">홀랜드</span>
+        <span class="tag">직업가치관</span>
+      </div>
+      <!-- 위젯 영역: 접기/펼치기 -->
+      <button class="toggle-btn" onclick="toggleWidget(this, 'frame1')">▼ 위젯 열기</button>
+      <iframe id="frame1"
+        class="widget-frame"
+        src="widgets/strength_diagnostic.html"
+        style="display:none; height:600px;"
+        onload="this.style.height = this.contentDocument.body.scrollHeight + 'px'">
+      </iframe>
+    </div>
+
+    <!-- ② 자기소개서 도우미 -->
+    <div class="widget-card">
+      <div class="card-header">
+        <div class="card-icon icon-teal">✍️</div>
+        <div>
+          <div class="card-title">자기소개서 도우미</div>
+        </div>
+      </div>
+      <div class="card-desc">STAR 기법 기반 항목별 작성 가이드. AI가 실시간 피드백·개선 제안을 제공합니다.</div>
+      <div class="tag-row">
+        <span class="tag">STAR 기법</span>
+        <span class="tag">AI 피드백</span>
+      </div>
+      <button class="toggle-btn" onclick="toggleWidget(this, 'frame2')">▼ 위젯 열기</button>
+      <iframe id="frame2"
+        class="widget-frame"
+        src="widgets/coverletter_helper.html"
+        style="display:none; height:600px;">
+      </iframe>
+    </div>
+
+    <!-- ③ 직업 탐색·커리어 맵 -->
+    <div class="widget-card">
+      <div class="card-header">
+        <div class="card-icon icon-amber">🗺️</div>
+        <div>
+          <div class="card-title">직업 탐색·커리어 맵</div>
+        </div>
+      </div>
+      <div class="card-desc">관심 키워드 입력 → 연관 직업군·필요 역량·취업 경로를 인터랙티브 맵으로 탐색합니다.</div>
+      <div class="tag-row">
+        <span class="tag">커리어 경로</span>
+        <span class="tag">직업 정보</span>
+      </div>
+      <button class="toggle-btn" onclick="toggleWidget(this, 'frame3')">▼ 위젯 열기</button>
+      <iframe id="frame3"
+        class="widget-frame"
+        src="widgets/career_map.html"
+        style="display:none; height:600px;">
+      </iframe>
+    </div>
+
+    <!-- ④ 면접 연습 도구 -->
+    <div class="widget-card">
+      <div class="card-header">
+        <div class="card-icon icon-coral">🎙️</div>
+        <div>
+          <div class="card-title">면접 연습 도구</div>
+        </div>
+      </div>
+      <div class="card-desc">직무별 AI 예상 질문 생성 + 답변 입력 시 실시간 평가·개선 포인트를 제시합니다.</div>
+      <div class="tag-row">
+        <span class="tag">직무별 맞춤</span>
+        <span class="tag">AI 평가</span>
+      </div>
+      <button class="toggle-btn" onclick="toggleWidget(this, 'frame4')">▼ 위젯 열기</button>
+      <iframe id="frame4"
+        class="widget-frame"
+        src="widgets/interview_practice.html"
+        style="display:none; height:600px;">
+      </iframe>
+    </div>
+
+  </div>
+
+  <!-- 추후 추가 -->
+  <div class="section-label">추후 추가 예정</div>
+  <div class="grid">
+    <div class="widget-card coming">
+      <div class="card-header">
+        <div class="card-icon icon-purple">📄</div>
+        <div><div class="card-title">이력서 점검기</div></div>
+      </div>
+      <div class="card-desc">ATS 최적화 자동 분석·키워드 진단</div>
+      <div class="tag-row"><span class="tag">준비 중</span></div>
+    </div>
+    <div class="widget-card coming">
+      <div class="card-header">
+        <div class="card-icon icon-teal">📊</div>
+        <div><div class="card-title">취업 목표 플래너</div></div>
+      </div>
+      <div class="card-desc">D-day 기반 취업 준비 로드맵 생성</div>
+      <div class="tag-row"><span class="tag">준비 중</span></div>
+    </div>
+  </div>
+</main>
+
+<script>
+  // 위젯 접기/펼치기
+  function toggleWidget(btn, frameId) {
+    const frame = document.getElementById(frameId);
+    const isOpen = frame.style.display !== 'none';
+    frame.style.display = isOpen ? 'none' : 'block';
+    btn.textContent = isOpen ? '▼ 위젯 열기' : '▲ 위젯 닫기';
+  }
+</script>
+
+</body>
+</html>
