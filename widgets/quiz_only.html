@@ -190,58 +190,58 @@
     position:fixed;left:-9999px;top:0;
     width:480px;
     background:#fff;
-    padding:32px 28px;
+    padding:22px 24px;
     font-family:'Noto Sans KR',sans-serif;
-    font-size:14px;color:#111;
-    line-height:1.7;
+    font-size:13px;color:#111;
+    line-height:1.6;
   }
   #pdf-target .pdf-header{
-    text-align:center;margin-bottom:24px;
-    padding-bottom:20px;border-bottom:2px solid #EEF2FF;
+    text-align:center;margin-bottom:14px;
+    padding-bottom:12px;border-bottom:2px solid #EEF2FF;
   }
   #pdf-target .pdf-badge{
     display:inline-block;background:#EEF2FF;color:#4F46E5;
-    font-size:11px;font-weight:700;letter-spacing:.08em;
-    padding:4px 12px;border-radius:20px;margin-bottom:10px;
+    font-size:10px;font-weight:700;letter-spacing:.08em;
+    padding:3px 10px;border-radius:20px;margin-bottom:7px;
   }
-  #pdf-target .pdf-title{font-size:19px;font-weight:700;color:#111;margin-bottom:4px}
-  #pdf-target .pdf-date{font-size:12px;color:#aaa}
+  #pdf-target .pdf-title{font-size:17px;font-weight:700;color:#111;margin-bottom:3px}
+  #pdf-target .pdf-date{font-size:11px;color:#aaa}
   #pdf-target .pdf-ring{
-    width:100px;height:100px;border-radius:50%;
+    width:82px;height:82px;border-radius:50%;
     background:linear-gradient(135deg,#6366F1,#A78BFA);
     display:flex;flex-direction:column;
     align-items:center;justify-content:center;
-    margin:0 auto 16px;
+    margin:0 auto 12px;
   }
-  #pdf-target .pdf-ring .num{font-size:30px;font-weight:700;color:#fff;line-height:1}
-  #pdf-target .pdf-ring .denom{font-size:12px;color:rgba(255,255,255,.75);margin-top:2px}
-  #pdf-target .pdf-type{font-size:20px;font-weight:700;color:#111;text-align:center;margin-bottom:12px}
+  #pdf-target .pdf-ring .num{font-size:26px;font-weight:700;color:#fff;line-height:1}
+  #pdf-target .pdf-ring .denom{font-size:11px;color:rgba(255,255,255,.75);margin-top:1px}
+  #pdf-target .pdf-type{font-size:18px;font-weight:700;color:#111;text-align:center;margin-bottom:10px}
   #pdf-target .pdf-desc{
-    font-size:13px;color:#555;line-height:1.8;margin-bottom:20px;
-    background:#F8F7FF;border-radius:12px;padding:14px;word-break:keep-all;
+    font-size:12px;color:#555;line-height:1.75;margin-bottom:14px;
+    background:#F8F7FF;border-radius:10px;padding:11px 13px;word-break:keep-all;
   }
   #pdf-target .pdf-section-label{
-    font-size:11px;font-weight:700;color:#6366F1;letter-spacing:.06em;margin-bottom:10px;
+    font-size:10px;font-weight:700;color:#6366F1;letter-spacing:.06em;margin-bottom:8px;
   }
-  #pdf-target table{width:100%;border-collapse:collapse;margin-bottom:20px;font-size:12px}
+  #pdf-target table{width:100%;border-collapse:collapse;margin-bottom:14px;font-size:11px}
   #pdf-target table thead tr{background:#F8F7FF}
   #pdf-target table th{
-    padding:9px 10px;text-align:left;font-weight:700;
+    padding:7px 9px;text-align:left;font-weight:700;
     color:#6366F1;font-size:10px;border-bottom:2px solid #EEF2FF;
   }
-  #pdf-target table td{padding:10px;border-bottom:1px solid #F3F4F6;color:#333;vertical-align:middle}
+  #pdf-target table td{padding:8px 9px;border-bottom:1px solid #F3F4F6;color:#333;vertical-align:middle}
   #pdf-target table tr.hl td{background:#EEF2FF}
   #pdf-target table tr.hl td:first-child{border-left:3px solid #6366F1;font-weight:700;color:#4F46E5}
   #pdf-target .pdf-tip-box{
-    background:#F8F7FF;border-radius:12px;padding:14px;margin-bottom:20px;
+    background:#F8F7FF;border-radius:10px;padding:11px 13px;margin-bottom:14px;
   }
   #pdf-target .pdf-tip-label{
-    font-size:10px;font-weight:700;color:#6366F1;letter-spacing:.06em;margin-bottom:6px;
+    font-size:10px;font-weight:700;color:#6366F1;letter-spacing:.06em;margin-bottom:5px;
   }
-  #pdf-target .pdf-tip-text{font-size:13px;color:#333;line-height:1.75;word-break:keep-all}
+  #pdf-target .pdf-tip-text{font-size:12px;color:#333;line-height:1.7;word-break:keep-all}
   #pdf-target .pdf-footer{
-    border-top:1px solid #EEF2FF;padding-top:14px;
-    text-align:center;font-size:11px;color:#bbb;
+    border-top:1px solid #EEF2FF;padding-top:10px;
+    text-align:center;font-size:10px;color:#bbb;
   }
 
   /* ── 퀴즈/결과 토글 ── */
@@ -482,35 +482,30 @@ async function downloadPDF(){
       windowWidth:480
     });
 
-    var imgData=canvas.toDataURL('image/jpeg',0.97);
+    var imgData=canvas.toDataURL('image/jpeg',0.95);
     var {jsPDF}=window.jspdf;
     var doc=new jsPDF({unit:'mm',format:'a4',orientation:'portrait'});
-    var pageW=doc.internal.pageSize.getWidth();
-    var pageH=doc.internal.pageSize.getHeight();
-    var margin=12;
-    var imgW=pageW-(margin*2);
+    var pageW=doc.internal.pageSize.getWidth();   // 210mm
+    var pageH=doc.internal.pageSize.getHeight();  // 297mm
+    var margin=14;
+    var maxW=pageW-(margin*2);   // 182mm
+    var maxH=pageH-(margin*2);   // 269mm
+
+    // 캔버스 비율 유지하며 1페이지 안에 맞게 축소
+    var imgW=maxW;
     var imgH=canvas.height*(imgW/canvas.width);
 
-    if(imgH<=pageH-(margin*2)){
-      doc.addImage(imgData,'JPEG',margin,margin,imgW,imgH);
-    }else{
-      // 내용이 길면 페이지 분할
-      var remain=imgH, srcY=0;
-      var sliceH=pageH-(margin*2);
-      var ratio=canvas.width/imgW;
-      var first=true;
-      while(remain>0){
-        if(!first){doc.addPage();}
-        first=false;
-        var drawH=Math.min(sliceH,remain);
-        var srcH=drawH*ratio;
-        var slice=document.createElement('canvas');
-        slice.width=canvas.width; slice.height=Math.ceil(srcH);
-        slice.getContext('2d').drawImage(canvas,0,Math.round(srcY),canvas.width,Math.ceil(srcH),0,0,canvas.width,Math.ceil(srcH));
-        doc.addImage(slice.toDataURL('image/jpeg',0.97),'JPEG',margin,margin,imgW,drawH);
-        remain-=drawH; srcY+=srcH;
-      }
+    if(imgH>maxH){
+      // 높이 기준으로 다시 축소
+      imgH=maxH;
+      imgW=canvas.width*(imgH/canvas.height);
     }
+
+    // 수평 중앙 정렬
+    var offsetX=margin+(maxW-imgW)/2;
+    var offsetY=margin;
+
+    doc.addImage(imgData,'JPEG',offsetX,offsetY,imgW,imgH);
 
     var fileName='시간관리유형_'+getTodayStr().replace(/년\s/,'').replace(/월\s/,'-').replace('일','')+'.pdf';
     doc.save(fileName);
