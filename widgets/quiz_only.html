@@ -2,56 +2,118 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>시간관리 유형 자가진단</title>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap');
-  *{box-sizing:border-box;margin:0;padding:0}
-  body{font-family:'Noto Sans KR',sans-serif;background:#f5f5f7;min-height:100vh;display:flex;align-items:flex-start;justify-content:center;padding:24px 16px 48px}
-  .card{background:#fff;border-radius:24px;width:100%;max-width:480px;padding:28px 24px;box-shadow:0 4px 24px rgba(0,0,0,.08)}
 
-  /* 헤더 */
-  .header{text-align:center;margin-bottom:28px}
-  .header .badge{display:inline-block;background:#EEF2FF;color:#4F46E5;font-size:11px;font-weight:700;letter-spacing:.08em;padding:5px 12px;border-radius:20px;margin-bottom:12px}
-  .header h1{font-size:20px;font-weight:700;color:#111;line-height:1.4;margin-bottom:6px}
-  .header p{font-size:13px;color:#888;line-height:1.5}
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 
-  /* 진행 바 */
-  .progress-wrap{margin-bottom:24px}
+  body{
+    font-family:'Noto Sans KR',sans-serif;
+    background:#f5f5f7;
+    min-height:100vh;
+    min-height:100dvh;
+    display:flex;
+    align-items:flex-start;
+    justify-content:center;
+    padding:16px 12px 40px;
+  }
+
+  .card{
+    background:#fff;
+    border-radius:20px;
+    width:100%;
+    max-width:480px;
+    padding:24px 20px;
+    box-shadow:0 4px 24px rgba(0,0,0,.08);
+  }
+
+  /* ── 헤더 ── */
+  .header{text-align:center;margin-bottom:24px}
+  .header .badge{
+    display:inline-block;background:#EEF2FF;color:#4F46E5;
+    font-size:11px;font-weight:700;letter-spacing:.08em;
+    padding:5px 12px;border-radius:20px;margin-bottom:10px
+  }
+  .header h1{font-size:19px;font-weight:700;color:#111;line-height:1.4;margin-bottom:5px}
+  .header p{font-size:13px;color:#888}
+
+  /* ── 진행 바 ── */
+  .progress-wrap{margin-bottom:22px}
   .progress-meta{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
   .progress-meta span{font-size:12px;color:#aaa}
   .progress-meta strong{font-size:13px;color:#4F46E5;font-weight:700}
   .progress-track{height:6px;background:#EEF2FF;border-radius:3px;overflow:hidden}
-  .progress-bar{height:6px;background:linear-gradient(90deg,#6366F1,#818CF8);border-radius:3px;transition:width .4s cubic-bezier(.4,0,.2,1)}
+  .progress-bar{
+    height:6px;
+    background:linear-gradient(90deg,#6366F1,#818CF8);
+    border-radius:3px;
+    transition:width .4s cubic-bezier(.4,0,.2,1)
+  }
 
-  /* 문항 */
-  .q-num{font-size:11px;font-weight:700;color:#A5B4FC;letter-spacing:.06em;margin-bottom:10px}
-  .q-text{font-size:17px;font-weight:500;color:#111;line-height:1.6;margin-bottom:8px;min-height:56px}
-  .q-rev{font-size:12px;color:#F59E0B;font-weight:500;min-height:20px;margin-bottom:20px}
+  /* ── 문항 ── */
+  .q-num{font-size:11px;font-weight:700;color:#A5B4FC;letter-spacing:.06em;margin-bottom:8px}
+  .q-text{
+    font-size:16px;font-weight:500;color:#111;
+    line-height:1.65;margin-bottom:6px;min-height:52px;
+    word-break:keep-all;word-wrap:break-word
+  }
+  .q-rev{font-size:12px;color:#F59E0B;font-weight:500;min-height:18px;margin-bottom:20px}
 
-  /* 버튼 */
+  /* ── 답변 버튼 ── */
   .btn-row{display:flex;gap:10px}
-  .btn{flex:1;padding:14px 10px;border-radius:14px;border:none;font-size:15px;font-weight:600;cursor:pointer;transition:transform .12s,box-shadow .12s;font-family:'Noto Sans KR',sans-serif}
-  .btn:active{transform:scale(.96)}
+  .btn{
+    flex:1;
+    padding:16px 10px;
+    border-radius:14px;border:none;
+    font-size:16px;font-weight:600;
+    cursor:pointer;
+    font-family:'Noto Sans KR',sans-serif;
+    transition:transform .12s,box-shadow .12s,opacity .12s;
+    touch-action:manipulation;
+    -webkit-user-select:none;user-select:none;
+  }
+  .btn:active{transform:scale(.95);opacity:.88}
   .btn-yes{background:#4F46E5;color:#fff;box-shadow:0 4px 12px rgba(79,70,229,.3)}
-  .btn-yes:hover{box-shadow:0 6px 18px rgba(79,70,229,.4)}
   .btn-no{background:#F3F4F6;color:#555}
-  .btn-no:hover{background:#E5E7EB}
 
-  /* 결과 */
+  /* ── 결과 ── */
   .result{display:none;text-align:center}
   .result.show{display:block}
-  .score-ring{width:110px;height:110px;border-radius:50%;background:linear-gradient(135deg,#6366F1,#A78BFA);display:flex;flex-direction:column;align-items:center;justify-content:center;margin:0 auto 20px}
+  .score-ring{
+    width:110px;height:110px;border-radius:50%;
+    background:linear-gradient(135deg,#6366F1,#A78BFA);
+    display:flex;flex-direction:column;
+    align-items:center;justify-content:center;
+    margin:0 auto 18px
+  }
   .score-ring .num{font-size:32px;font-weight:700;color:#fff;line-height:1}
   .score-ring .denom{font-size:13px;color:rgba(255,255,255,.75);margin-top:2px}
-  .result-type{font-size:22px;font-weight:700;color:#111;margin-bottom:10px}
-  .result-desc{font-size:14px;color:#555;line-height:1.75;margin-bottom:20px;text-align:left}
+  .result-type{font-size:21px;font-weight:700;color:#111;margin-bottom:10px}
+  .result-desc{
+    font-size:14px;color:#555;line-height:1.8;
+    margin-bottom:20px;text-align:left;
+    word-break:keep-all
+  }
 
-  /* 유형 표 */
+  /* ── 유형 표 ── */
   .type-table{width:100%;border-collapse:collapse;margin-bottom:20px;font-size:13px}
   .type-table thead tr{background:#F8F7FF}
-  .type-table th{padding:10px 12px;text-align:left;font-weight:700;color:#6366F1;font-size:11px;letter-spacing:.05em;border-bottom:2px solid #EEF2FF}
-  .type-table td{padding:11px 12px;border-bottom:1px solid #F3F4F6;color:#333;vertical-align:middle;line-height:1.4}
+  .type-table th{
+    padding:10px 10px;text-align:left;font-weight:700;
+    color:#6366F1;font-size:11px;letter-spacing:.05em;
+    border-bottom:2px solid #EEF2FF
+  }
+  .type-table td{
+    padding:11px 10px;border-bottom:1px solid #F3F4F6;
+    color:#333;vertical-align:middle;line-height:1.4;
+    word-break:keep-all
+  }
   .type-table tr:last-child td{border-bottom:none}
   .type-table tr.highlight td{background:#EEF2FF}
   .type-table tr.highlight td:first-child{border-left:3px solid #6366F1}
@@ -59,21 +121,145 @@
   .type-name{font-weight:600;color:#222}
   .type-name.active{color:#4F46E5}
 
-  /* 팁 박스 */
-  .tip-box{background:#F8F7FF;border-radius:14px;padding:16px;margin-bottom:20px;text-align:left}
+  /* ── 팁 박스 ── */
+  .tip-box{
+    background:#F8F7FF;border-radius:14px;
+    padding:16px;margin-bottom:20px;text-align:left
+  }
   .tip-box .tip-label{font-size:11px;font-weight:700;color:#6366F1;letter-spacing:.06em;margin-bottom:6px}
-  .tip-box p{font-size:14px;color:#333;line-height:1.7}
+  .tip-box p{font-size:14px;color:#333;line-height:1.75;word-break:keep-all}
 
-  /* 재시작 */
-  .retry-btn{width:100%;padding:14px;border-radius:14px;border:2px solid #E0E0E0;background:#fff;font-size:15px;font-weight:600;color:#888;cursor:pointer;font-family:'Noto Sans KR',sans-serif;transition:border-color .15s,color .15s}
-  .retry-btn:hover{border-color:#6366F1;color:#4F46E5}
+  /* ── 하단 버튼 그룹 ── */
+  .action-row{display:flex;gap:10px}
 
-  /* 퀴즈 섹션 숨기기 */
+  .retry-btn{
+    flex:1;
+    padding:15px 10px;
+    border-radius:14px;border:2px solid #E0E0E0;
+    background:#fff;font-size:15px;font-weight:600;color:#888;
+    cursor:pointer;font-family:'Noto Sans KR',sans-serif;
+    transition:border-color .15s,color .15s;
+    touch-action:manipulation;
+  }
+  .retry-btn:active{background:#f5f5f7}
+
+  .pdf-btn{
+    flex:1;
+    padding:15px 10px;
+    border-radius:14px;border:none;
+    background:linear-gradient(135deg,#6366F1,#818CF8);
+    color:#fff;font-size:15px;font-weight:700;
+    cursor:pointer;font-family:'Noto Sans KR',sans-serif;
+    display:flex;align-items:center;justify-content:center;gap:7px;
+    box-shadow:0 4px 14px rgba(99,102,241,.35);
+    touch-action:manipulation;
+    transition:opacity .15s,transform .12s;
+  }
+  .pdf-btn:active{opacity:.85;transform:scale(.97)}
+  .pdf-btn svg{flex-shrink:0}
+
+  /* ── PDF 생성 오버레이 ── */
+  .overlay{
+    display:none;position:fixed;inset:0;
+    background:rgba(0,0,0,.45);
+    z-index:9999;
+    align-items:center;justify-content:center;
+    backdrop-filter:blur(3px);
+    -webkit-backdrop-filter:blur(3px);
+  }
+  .overlay.show{display:flex}
+  .overlay-box{
+    background:#fff;border-radius:20px;
+    padding:32px 36px;text-align:center;
+    box-shadow:0 20px 60px rgba(0,0,0,.2);
+    max-width:260px;width:90%;
+  }
+  .spinner{
+    width:42px;height:42px;
+    border:4px solid #EEF2FF;
+    border-top-color:#6366F1;
+    border-radius:50%;
+    animation:spin .8s linear infinite;
+    margin:0 auto 14px;
+  }
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .overlay-box p{font-size:14px;color:#666;font-weight:500;line-height:1.6}
+
+  /* ── PDF 캡처용 숨김 컨테이너 ── */
+  #pdf-target{
+    position:fixed;left:-9999px;top:0;
+    width:480px;
+    background:#fff;
+    padding:32px 28px;
+    font-family:'Noto Sans KR',sans-serif;
+    font-size:14px;color:#111;
+    line-height:1.7;
+  }
+  #pdf-target .pdf-header{
+    text-align:center;margin-bottom:24px;
+    padding-bottom:20px;border-bottom:2px solid #EEF2FF;
+  }
+  #pdf-target .pdf-badge{
+    display:inline-block;background:#EEF2FF;color:#4F46E5;
+    font-size:11px;font-weight:700;letter-spacing:.08em;
+    padding:4px 12px;border-radius:20px;margin-bottom:10px;
+  }
+  #pdf-target .pdf-title{font-size:19px;font-weight:700;color:#111;margin-bottom:4px}
+  #pdf-target .pdf-date{font-size:12px;color:#aaa}
+  #pdf-target .pdf-ring{
+    width:100px;height:100px;border-radius:50%;
+    background:linear-gradient(135deg,#6366F1,#A78BFA);
+    display:flex;flex-direction:column;
+    align-items:center;justify-content:center;
+    margin:0 auto 16px;
+  }
+  #pdf-target .pdf-ring .num{font-size:30px;font-weight:700;color:#fff;line-height:1}
+  #pdf-target .pdf-ring .denom{font-size:12px;color:rgba(255,255,255,.75);margin-top:2px}
+  #pdf-target .pdf-type{font-size:20px;font-weight:700;color:#111;text-align:center;margin-bottom:12px}
+  #pdf-target .pdf-desc{
+    font-size:13px;color:#555;line-height:1.8;margin-bottom:20px;
+    background:#F8F7FF;border-radius:12px;padding:14px;word-break:keep-all;
+  }
+  #pdf-target .pdf-section-label{
+    font-size:11px;font-weight:700;color:#6366F1;letter-spacing:.06em;margin-bottom:10px;
+  }
+  #pdf-target table{width:100%;border-collapse:collapse;margin-bottom:20px;font-size:12px}
+  #pdf-target table thead tr{background:#F8F7FF}
+  #pdf-target table th{
+    padding:9px 10px;text-align:left;font-weight:700;
+    color:#6366F1;font-size:10px;border-bottom:2px solid #EEF2FF;
+  }
+  #pdf-target table td{padding:10px;border-bottom:1px solid #F3F4F6;color:#333;vertical-align:middle}
+  #pdf-target table tr.hl td{background:#EEF2FF}
+  #pdf-target table tr.hl td:first-child{border-left:3px solid #6366F1;font-weight:700;color:#4F46E5}
+  #pdf-target .pdf-tip-box{
+    background:#F8F7FF;border-radius:12px;padding:14px;margin-bottom:20px;
+  }
+  #pdf-target .pdf-tip-label{
+    font-size:10px;font-weight:700;color:#6366F1;letter-spacing:.06em;margin-bottom:6px;
+  }
+  #pdf-target .pdf-tip-text{font-size:13px;color:#333;line-height:1.75;word-break:keep-all}
+  #pdf-target .pdf-footer{
+    border-top:1px solid #EEF2FF;padding-top:14px;
+    text-align:center;font-size:11px;color:#bbb;
+  }
+
+  /* ── 퀴즈/결과 토글 ── */
   .quiz-section{display:block}
   .quiz-section.hide{display:none}
+
+  /* ── 노치 폰 안전 영역 ── */
+  @supports(padding:max(0px)){
+    body{
+      padding-left:max(12px,env(safe-area-inset-left));
+      padding-right:max(12px,env(safe-area-inset-right));
+      padding-bottom:max(40px,env(safe-area-inset-bottom));
+    }
+  }
 </style>
 </head>
 <body>
+
 <div class="card">
 
   <!-- 퀴즈 섹션 -->
@@ -100,7 +286,7 @@
 
     <div class="btn-row">
       <button class="btn btn-yes" onclick="answer(true)">해당해요</button>
-      <button class="btn btn-no" onclick="answer(false)">아니에요</button>
+      <button class="btn btn-no"  onclick="answer(false)">아니에요</button>
     </div>
   </div>
 
@@ -131,12 +317,34 @@
       <p id="r-tip"></p>
     </div>
 
-    <button class="retry-btn" onclick="restart()">다시 해보기</button>
+    <div class="action-row">
+      <button class="retry-btn" onclick="restart()">🔄 다시 해보기</button>
+      <button class="pdf-btn" onclick="downloadPDF()">
+        <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M12 16l-4-4m4 4l4-4m-4 4V4M4 20h16"/>
+        </svg>
+        PDF 저장
+      </button>
+    </div>
   </div>
 
 </div>
 
+<!-- 생성 중 오버레이 -->
+<div class="overlay" id="overlay">
+  <div class="overlay-box">
+    <div class="spinner"></div>
+    <p>결과지를 PDF로<br>만들고 있어요 📄</p>
+  </div>
+</div>
+
+<!-- PDF 캡처 전용 숨김 레이아웃 -->
+<div id="pdf-target"></div>
+
 <script>
+/* ══════════════════════
+   문항 데이터 (원본)
+══════════════════════ */
 var qs=[
   {t:"하루 시작 전 오늘 할 일을 미리 정해둔다",rev:false},
   {t:"마감일이 다가와야 과제를 시작하는 편이다",rev:true},
@@ -149,6 +357,7 @@ var qs=[
   {t:"50분 공부·10분 휴식처럼 나만의 공부 리듬이 있다",rev:false},
   {t:"하루를 마치며 오늘 한 일을 간단히 돌아보는 편이다",rev:false}
 ];
+
 var types=[
   {rid:"row0",name:"시간 설계자",
    desc:"계획을 세우고 실행하는 두 가지가 모두 탄탄한 유형이에요. 이 습관, 지금은 당연해 보여도 3학년 되면 이걸 가진 사람 찾기가 진짜 어려워져요. 지금 이 루틴이 취업까지 이어집니다.",
@@ -163,7 +372,12 @@ var types=[
    desc:"계획 자체가 낯선 단계예요. 근데 이거 성격이 나쁜 게 아니에요. 지금까지 아무도 시간 쓰는 법을 제대로 가르쳐주지 않았던 거예요. 오늘 이 강의 들으러 온 것 자체가 이미 시작이에요.",
    tip:"강의 끝나고 나가면서 핸드폰 메모앱에 '내일 할 일 1가지'만 적어주세요. 딱 1가지. 그게 시간관리의 진짜 시작이에요."}
 ];
-var cur=0,score=0;
+
+/* ══════════════════════
+   퀴즈 로직 (원본)
+══════════════════════ */
+var cur=0, score=0, currentType=null;
+
 function render(){
   var q=qs[cur];
   var n=(cur+1).toString().padStart(2,'0');
@@ -173,20 +387,29 @@ function render(){
   document.getElementById('q-counter').textContent=(cur+1)+' / '+qs.length;
   document.getElementById('q-bar').style.width=((cur+1)/qs.length*100)+'%';
 }
+
 function answer(yes){
   score+=yes?(qs[cur].rev?0:1):(qs[cur].rev?1:0);
   cur++;
   if(cur<qs.length){render();}else{showResult();}
 }
+
 function showResult(){
   document.getElementById('quiz-section').classList.add('hide');
   var rd=document.getElementById('result');
   rd.classList.add('show');
-  var t=types.find(function(x){return score>=(x===types[0]?8:x===types[1]?5:x===types[2]?3:0)&&score<=(x===types[0]?10:x===types[1]?7:x===types[2]?4:2)})||types[3];
+
+  var t=types.find(function(x){
+    return score>=(x===types[0]?8:x===types[1]?5:x===types[2]?3:0)
+        && score<=(x===types[0]?10:x===types[1]?7:x===types[2]?4:2);
+  })||types[3];
+
+  currentType=t;
   document.getElementById('r-score').textContent=score;
   document.getElementById('r-type').textContent=t.name;
   document.getElementById('r-desc').textContent=t.desc;
   document.getElementById('r-tip').textContent=t.tip;
+
   ['row0','row1','row2','row3'].forEach(function(id){
     var row=document.getElementById(id);
     row.classList.remove('highlight');
@@ -196,13 +419,109 @@ function showResult(){
   hr.classList.add('highlight');
   hr.querySelector('.type-name').classList.add('active');
 }
+
 function restart(){
-  cur=0;score=0;
+  cur=0;score=0;currentType=null;
   document.getElementById('result').classList.remove('show');
   document.getElementById('quiz-section').classList.remove('hide');
   render();
 }
+
 render();
+
+/* ══════════════════════
+   PDF 다운로드
+══════════════════════ */
+function getTodayStr(){
+  var d=new Date();
+  return d.getFullYear()+'년 '+(d.getMonth()+1)+'월 '+d.getDate()+'일';
+}
+
+function buildPdfTarget(){
+  var t=currentType;
+  var tableRows=['row0','row1','row2','row3'].map(function(rid){
+    var origRow=document.getElementById(rid);
+    var isHL=origRow.classList.contains('highlight');
+    var cells=origRow.querySelectorAll('td');
+    return '<tr class="'+(isHL?'hl':'')+'"><td>'+cells[0].innerText+'</td>'
+          +'<td>'+cells[1].innerText+'</td>'
+          +'<td>'+cells[2].innerText+'</td></tr>';
+  }).join('');
+
+  document.getElementById('pdf-target').innerHTML=
+    '<div class="pdf-header">'
+    +'<div class="pdf-badge">DoDream 3주차</div>'
+    +'<div class="pdf-title">나의 시간관리 유형은?</div>'
+    +'<div class="pdf-date">'+getTodayStr()+' 진단 완료</div>'
+    +'</div>'
+    +'<div class="pdf-ring"><span class="num">'+score+'</span><span class="denom">/ 10점</span></div>'
+    +'<div class="pdf-type">'+t.name+'</div>'
+    +'<div class="pdf-desc">'+t.desc+'</div>'
+    +'<div class="pdf-section-label">유형별 점수표</div>'
+    +'<table><thead><tr><th>유형</th><th>점수</th><th>핵심 특징</th></tr></thead><tbody>'+tableRows+'</tbody></table>'
+    +'<div class="pdf-tip-box"><div class="pdf-tip-label">이번 주 실천 팁</div><div class="pdf-tip-text">'+t.tip+'</div></div>'
+    +'<div class="pdf-footer">DoDream 진로취업 프로그램 · 시간관리 유형 자가진단 결과지</div>';
+}
+
+async function downloadPDF(){
+  if(!currentType){return;}
+  document.getElementById('overlay').classList.add('show');
+  buildPdfTarget();
+
+  // 폰트 로드 대기
+  await new Promise(function(r){setTimeout(r,700);});
+
+  try{
+    var target=document.getElementById('pdf-target');
+    var canvas=await html2canvas(target,{
+      scale:2,
+      useCORS:true,
+      backgroundColor:'#ffffff',
+      logging:false,
+      width:480,
+      windowWidth:480
+    });
+
+    var imgData=canvas.toDataURL('image/jpeg',0.97);
+    var {jsPDF}=window.jspdf;
+    var doc=new jsPDF({unit:'mm',format:'a4',orientation:'portrait'});
+    var pageW=doc.internal.pageSize.getWidth();
+    var pageH=doc.internal.pageSize.getHeight();
+    var margin=12;
+    var imgW=pageW-(margin*2);
+    var imgH=canvas.height*(imgW/canvas.width);
+
+    if(imgH<=pageH-(margin*2)){
+      doc.addImage(imgData,'JPEG',margin,margin,imgW,imgH);
+    }else{
+      // 내용이 길면 페이지 분할
+      var remain=imgH, srcY=0;
+      var sliceH=pageH-(margin*2);
+      var ratio=canvas.width/imgW;
+      var first=true;
+      while(remain>0){
+        if(!first){doc.addPage();}
+        first=false;
+        var drawH=Math.min(sliceH,remain);
+        var srcH=drawH*ratio;
+        var slice=document.createElement('canvas');
+        slice.width=canvas.width; slice.height=Math.ceil(srcH);
+        slice.getContext('2d').drawImage(canvas,0,Math.round(srcY),canvas.width,Math.ceil(srcH),0,0,canvas.width,Math.ceil(srcH));
+        doc.addImage(slice.toDataURL('image/jpeg',0.97),'JPEG',margin,margin,imgW,drawH);
+        remain-=drawH; srcY+=srcH;
+      }
+    }
+
+    var fileName='시간관리유형_'+getTodayStr().replace(/년\s/,'').replace(/월\s/,'-').replace('일','')+'.pdf';
+    doc.save(fileName);
+
+  }catch(e){
+    alert('PDF 생성 중 오류가 발생했습니다.\n'+e.message);
+    console.error(e);
+  }finally{
+    document.getElementById('overlay').classList.remove('show');
+  }
+}
 </script>
 </body>
 </html>
