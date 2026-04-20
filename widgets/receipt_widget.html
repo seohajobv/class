@@ -2,76 +2,220 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>24시간 타임 영수증</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap');
-  *{box-sizing:border-box;margin:0;padding:0}
-  body{font-family:'Noto Sans KR',sans-serif;background:#f5f5f7;min-height:100vh;display:flex;align-items:flex-start;justify-content:center;padding:24px 16px 48px}
-  .card{background:#fff;border-radius:24px;width:100%;max-width:480px;padding:28px 24px;box-shadow:0 4px 24px rgba(0,0,0,.08)}
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap');
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{font-family:'Noto Sans KR',sans-serif;background:#f5f5f7;min-height:100vh;min-height:100dvh;display:flex;align-items:flex-start;justify-content:center;padding:16px 12px 40px}
+.card{background:#fff;border-radius:20px;width:100%;max-width:480px;padding:24px 20px;box-shadow:0 4px 24px rgba(0,0,0,.08)}
 
-  .header{text-align:center;margin-bottom:24px}
-  .badge{display:inline-block;background:#FEF3C7;color:#92400E;font-size:11px;font-weight:700;letter-spacing:.08em;padding:5px 12px;border-radius:20px;margin-bottom:12px}
-  .header h1{font-size:20px;font-weight:700;color:#111;margin-bottom:6px}
-  .header p{font-size:13px;color:#888;line-height:1.5}
+/* ── 헤더 ── */
+.header{text-align:center;margin-bottom:22px}
+.badge{display:inline-block;background:#FEF3C7;color:#92400E;font-size:11px;font-weight:700;letter-spacing:.08em;padding:5px 12px;border-radius:20px;margin-bottom:10px}
+.header h1{font-size:19px;font-weight:700;color:#111;margin-bottom:5px}
+.header p{font-size:13px;color:#888;line-height:1.5}
 
-  .r-row{display:flex;align-items:center;gap:12px;padding:11px 0;border-bottom:1px solid #F3F4F6}
-  .r-row:last-child{border-bottom:none}
-  .r-icon{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
-  .r-label{flex:1}
-  .r-label .name{font-size:14px;font-weight:500;color:#222}
-  .r-label .sub{font-size:11px;color:#aaa;margin-top:2px}
-  .r-input-wrap{display:flex;align-items:center;gap:5px}
-  .r-input{width:56px;text-align:right;font-size:15px;font-weight:500;padding:7px 8px;border:1.5px solid #E5E7EB;border-radius:10px;color:#222;font-family:'Noto Sans KR',sans-serif;background:#fff}
-  .r-input:focus{outline:none;border-color:#F59E0B}
-  .r-unit{font-size:13px;color:#aaa}
-  .thief-section{background:#FFFBEB;border-radius:14px;padding:4px 12px;margin:8px 0}
-  .thief-label{font-size:10px;font-weight:700;color:#D97706;letter-spacing:.07em;padding-top:10px;margin-bottom:2px}
+/* ── 입력 행 ── */
+.r-row{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid #F3F4F6}
+.r-row:last-child{border-bottom:none}
+.r-icon{width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0}
+.r-label{flex:1}
+.r-label .name{font-size:13px;font-weight:500;color:#222}
+.r-label .sub{font-size:11px;color:#bbb;margin-top:1px}
+.r-input-wrap{display:flex;align-items:center;gap:4px}
+.r-input{width:52px;text-align:right;font-size:15px;font-weight:600;padding:6px 7px;border:1.5px solid #E5E7EB;border-radius:9px;color:#222;font-family:'Noto Sans KR',sans-serif;background:#fff;touch-action:manipulation}
+.r-input:focus{outline:none;border-color:#F59E0B}
+.r-unit{font-size:12px;color:#bbb}
+.thief-section{background:#FFFBEB;border-radius:12px;padding:2px 10px 6px;margin:6px 0}
+.thief-label{font-size:10px;font-weight:700;color:#D97706;letter-spacing:.07em;padding-top:9px;margin-bottom:1px}
 
-  .calc-btn{width:100%;margin-top:20px;padding:15px;border-radius:14px;border:none;background:#F59E0B;color:#fff;font-size:16px;font-weight:700;cursor:pointer;font-family:'Noto Sans KR',sans-serif;transition:background .15s,transform .1s;box-shadow:0 4px 12px rgba(245,158,11,.3)}
-  .calc-btn:hover{background:#D97706}
-  .calc-btn:active{transform:scale(.97)}
+/* ── 계산 버튼 ── */
+.calc-btn{width:100%;margin-top:18px;padding:15px;border-radius:13px;border:none;background:#F59E0B;color:#fff;font-size:16px;font-weight:700;cursor:pointer;font-family:'Noto Sans KR',sans-serif;box-shadow:0 4px 12px rgba(245,158,11,.3);touch-action:manipulation;transition:opacity .15s}
+.calc-btn:active{opacity:.85}
+.total-disp{text-align:center;font-size:13px;color:#aaa;margin-top:8px}
+.total-disp span{color:#F59E0B;font-weight:700}
+.total-warn{color:#EF4444!important}
 
-  .total-disp{text-align:center;font-size:13px;color:#aaa;margin-top:10px}
-  .total-disp span{color:#F59E0B;font-weight:700}
+/* ── 결과 ── */
+.result{display:none;margin-top:22px}
+.result.show{display:block}
 
-  .result{display:none;margin-top:24px}
-  .result.show{display:block}
+/* 도넛 차트 영역 */
+.chart-area{display:flex;align-items:center;gap:16px;margin-bottom:18px}
+.donut-wrap{position:relative;flex-shrink:0}
+.donut-wrap svg{display:block}
+.donut-center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center}
+.donut-center .dc-val{font-size:20px;font-weight:900;color:#111;line-height:1}
+.donut-center .dc-sub{font-size:9px;color:#aaa;margin-top:2px}
+.legend-list{flex:1;display:flex;flex-direction:column;gap:8px}
+.leg-item{display:flex;align-items:center;gap:8px}
+.leg-dot{width:10px;height:10px;border-radius:3px;flex-shrink:0}
+.leg-info{flex:1}
+.leg-name{font-size:12px;font-weight:500;color:#333}
+.leg-bar-bg{height:5px;background:#F3F4F6;border-radius:3px;margin-top:3px;overflow:hidden}
+.leg-bar-fill{height:5px;border-radius:3px;transition:width .6s ease}
+.leg-h{font-size:12px;font-weight:700;color:#555;white-space:nowrap}
 
-  .stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px}
-  .stat-card{border-radius:14px;padding:14px}
-  .stat-card .sc-label{font-size:11px;font-weight:700;letter-spacing:.05em;margin-bottom:6px}
-  .stat-card .sc-val{font-size:24px;font-weight:700;line-height:1}
-  .stat-card .sc-sub{font-size:11px;margin-top:4px}
-  .sc-growth{background:#ECFDF5;}.sc-growth .sc-label{color:#065F46}.sc-growth .sc-val{color:#059669}.sc-growth .sc-sub{color:#6EE7B7}
-  .sc-thief{background:#FFF7ED;}.sc-thief .sc-label{color:#92400E}.sc-thief .sc-val{color:#F59E0B}.sc-thief .sc-sub{color:#FCD34D}
+/* 통계 카드 */
+.stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px}
+.stat-card{border-radius:12px;padding:12px}
+.sc-label{font-size:10px;font-weight:700;letter-spacing:.05em;margin-bottom:5px}
+.sc-val{font-size:22px;font-weight:900;line-height:1}
+.sc-sub{font-size:10px;margin-top:3px}
+.sc-growth{background:#ECFDF5}.sc-growth .sc-label{color:#065F46}.sc-growth .sc-val{color:#059669}.sc-growth .sc-sub{color:#6EE7B7}
+.sc-thief{background:#FFF7ED}.sc-thief .sc-label{color:#92400E}.sc-thief .sc-val{color:#F59E0B}.sc-thief .sc-sub{color:#FCD34D}
 
-  .bar-wrap{margin-bottom:6px}
-  .bar-track{height:10px;background:#F3F4F6;border-radius:5px;overflow:hidden;display:flex}
-  .bar-seg{height:10px;transition:width .5s cubic-bezier(.4,0,.2,1)}
-  .bar-legend{display:flex;gap:14px;margin-top:8px;margin-bottom:20px}
-  .bl{display:flex;align-items:center;gap:5px;font-size:11px;color:#888}
-  .bl-dot{width:8px;height:8px;border-radius:2px}
+/* 개인 메시지 박스 */
+.msg-box{border-radius:13px;padding:14px 15px;margin-bottom:14px}
+.msg-badge{font-size:10px;font-weight:700;letter-spacing:.07em;margin-bottom:6px}
+.msg-title{font-size:15px;font-weight:700;margin-bottom:5px;line-height:1.4}
+.msg-body{font-size:13px;line-height:1.75;word-break:keep-all}
+.msg-warn{background:#FFF7ED}.msg-warn .msg-badge{color:#D97706}.msg-warn .msg-title{color:#92400E}.msg-warn .msg-body{color:#78350F}
+.msg-caution{background:#FEF9C3}.msg-caution .msg-badge{color:#854D0E}.msg-caution .msg-title{color:#713F12}.msg-caution .msg-body{color:#713F12}
+.msg-ok{background:#ECFDF5}.msg-ok .msg-badge{color:#065F46}.msg-ok .msg-title{color:#064E3B}.msg-ok .msg-body{color:#064E3B}
 
-  .comment-box{border-radius:14px;padding:16px;margin-bottom:16px}
-  .comment-box .cb-label{font-size:11px;font-weight:700;letter-spacing:.06em;margin-bottom:6px}
-  .comment-box p{font-size:14px;line-height:1.75}
-  .cb-warn{background:#FFF7ED}.cb-warn .cb-label{color:#D97706}.cb-warn p{color:#92400E}
-  .cb-ok{background:#ECFDF5}.cb-ok .cb-label{color:#065F46}.cb-ok p{color:#064E3B}
+/* 실천 전략 카드 */
+.strategy-wrap{margin-bottom:14px}
+.strategy-title{font-size:11px;font-weight:700;color:#888;letter-spacing:.06em;margin-bottom:8px}
+.strategy-list{display:flex;flex-direction:column;gap:6px}
+.strategy-item{display:flex;align-items:flex-start;gap:8px;background:#F8F8F8;border-radius:10px;padding:10px 12px}
+.strategy-num{width:20px;height:20px;border-radius:6px;background:#F59E0B;color:#fff;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+.strategy-text{font-size:12px;color:#333;line-height:1.6;word-break:keep-all}
 
-  .year-section{margin-bottom:20px}
-  .year-section .ys-title{font-size:12px;font-weight:700;color:#888;letter-spacing:.06em;margin-bottom:10px}
-  .year-table{width:100%;border-collapse:collapse;font-size:13px}
-  .year-table th{text-align:left;padding:9px 10px;background:#F8F8F8;color:#888;font-size:11px;font-weight:700;letter-spacing:.05em}
-  .year-table th:first-child{border-radius:8px 0 0 8px}
-  .year-table th:last-child{border-radius:0 8px 8px 0}
-  .year-table td{padding:10px 10px;border-bottom:1px solid #F3F4F6;color:#333;vertical-align:middle}
-  .year-table tr:last-child td{border-bottom:none}
-  .year-table tr.my-row td{background:#FFF7ED;font-weight:700;color:#D97706}
-  .year-table tr.my-row td:first-child{border-left:3px solid #F59E0B}
+/* 1년 환산 */
+.year-section{margin-bottom:14px}
+.year-title{font-size:11px;font-weight:700;color:#888;letter-spacing:.06em;margin-bottom:8px}
+.year-table{width:100%;border-collapse:collapse;font-size:12px}
+.year-table th{text-align:left;padding:8px 9px;background:#F8F8F8;color:#888;font-size:10px;font-weight:700;letter-spacing:.04em}
+.year-table th:first-child{border-radius:7px 0 0 7px}
+.year-table th:last-child{border-radius:0 7px 7px 0}
+.year-table td{padding:9px 9px;border-bottom:1px solid #F3F4F6;color:#333;vertical-align:middle}
+.year-table tr:last-child td{border-bottom:none}
+.year-table tr.my-row td{background:#FFF7ED;font-weight:700;color:#D97706}
+.year-table tr.my-row td:first-child{border-left:3px solid #F59E0B}
 
-  .retry-btn{width:100%;padding:13px;border-radius:14px;border:1.5px solid #E5E7EB;background:#fff;font-size:14px;font-weight:600;color:#888;cursor:pointer;font-family:'Noto Sans KR',sans-serif;transition:border-color .15s,color .15s}
-  .retry-btn:hover{border-color:#F59E0B;color:#D97706}
+/* 하단 버튼 */
+.action-row{display:flex;gap:8px;margin-top:4px}
+.retry-btn{flex:1;padding:14px 8px;border-radius:13px;border:1.5px solid #E5E7EB;background:#fff;font-size:14px;font-weight:600;color:#888;cursor:pointer;font-family:'Noto Sans KR',sans-serif;touch-action:manipulation}
+.retry-btn:active{background:#f5f5f7}
+.pdf-btn{flex:1;padding:14px 8px;border-radius:13px;border:none;background:#F59E0B;color:#fff;font-size:14px;font-weight:700;cursor:pointer;font-family:'Noto Sans KR',sans-serif;display:flex;align-items:center;justify-content:center;gap:6px;box-shadow:0 4px 12px rgba(245,158,11,.3);touch-action:manipulation;transition:opacity .15s}
+.pdf-btn:active{opacity:.85}
+
+/* 오버레이 */
+.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:9999;align-items:center;justify-content:center;backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px)}
+.overlay.show{display:flex}
+.overlay-box{background:#fff;border-radius:18px;padding:28px 32px;text-align:center;max-width:240px;width:90%}
+.spinner{width:40px;height:40px;border:4px solid #FEF3C7;border-top-color:#F59E0B;border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 12px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.overlay-box p{font-size:13px;color:#666;font-weight:500;line-height:1.6}
+
+/* 안전 영역 */
+@supports(padding:max(0px)){
+  body{padding-left:max(12px,env(safe-area-inset-left));padding-right:max(12px,env(safe-area-inset-right));padding-bottom:max(40px,env(safe-area-inset-bottom))}
+}
+
+/* ── PDF 전용 숨김 레이아웃 ── */
+#pdf-target{
+  position:fixed;left:-9999px;top:0;
+  width:520px;background:#fff;
+  font-family:'Noto Sans KR',sans-serif;
+  color:#111;
+}
+#pdf-target .pt-wrap{padding:24px 26px}
+
+/* PDF 헤더 */
+#pdf-target .pt-header{
+  display:flex;align-items:center;justify-content:space-between;
+  padding-bottom:12px;border-bottom:2px solid #FEF3C7;margin-bottom:16px;
+}
+#pdf-target .pt-header-left .pt-badge{
+  display:inline-block;background:#FEF3C7;color:#92400E;font-size:9px;font-weight:700;
+  letter-spacing:.08em;padding:3px 9px;border-radius:20px;margin-bottom:5px;
+}
+#pdf-target .pt-header-left .pt-title{font-size:16px;font-weight:700;color:#111}
+#pdf-target .pt-header-left .pt-date{font-size:10px;color:#aaa;margin-top:2px}
+#pdf-target .pt-header-right{
+  background:#F59E0B;border-radius:12px;padding:8px 14px;text-align:center;
+}
+#pdf-target .pt-header-right .pt-score{font-size:22px;font-weight:900;color:#fff;line-height:1}
+#pdf-target .pt-header-right .pt-score-sub{font-size:9px;color:rgba(255,255,255,.8);margin-top:1px}
+
+/* PDF 2열 레이아웃 */
+#pdf-target .pt-cols{display:flex;gap:12px;margin-bottom:12px}
+#pdf-target .pt-col-l{flex:1.1}
+#pdf-target .pt-col-r{flex:0.9}
+
+/* PDF 도넛 차트 */
+#pdf-target .pt-chart-wrap{text-align:center;margin-bottom:10px}
+#pdf-target .pt-chart-wrap svg{display:inline-block}
+#pdf-target .pt-legend{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin-bottom:10px}
+#pdf-target .pt-leg{display:flex;align-items:center;gap:4px;font-size:10px;color:#555}
+#pdf-target .pt-leg-dot{width:8px;height:8px;border-radius:2px}
+
+/* PDF 스탯 카드 */
+#pdf-target .pt-stat-row{display:flex;gap:8px;margin-bottom:10px}
+#pdf-target .pt-stat{flex:1;border-radius:9px;padding:9px 10px}
+#pdf-target .pt-stat .ps-label{font-size:9px;font-weight:700;letter-spacing:.04em;margin-bottom:3px}
+#pdf-target .pt-stat .ps-val{font-size:18px;font-weight:900;line-height:1}
+#pdf-target .pt-stat .ps-sub{font-size:9px;margin-top:2px}
+#pdf-target .pt-stat.ps-g{background:#ECFDF5}
+#pdf-target .pt-stat.ps-g .ps-label{color:#065F46}
+#pdf-target .pt-stat.ps-g .ps-val{color:#059669}
+#pdf-target .pt-stat.ps-g .ps-sub{color:#6EE7B7}
+#pdf-target .pt-stat.ps-t{background:#FFF7ED}
+#pdf-target .pt-stat.ps-t .ps-label{color:#92400E}
+#pdf-target .pt-stat.ps-t .ps-val{color:#F59E0B}
+#pdf-target .pt-stat.ps-t .ps-sub{color:#FCD34D}
+
+/* PDF 시간 분배 바 */
+#pdf-target .pt-bar-title{font-size:9px;font-weight:700;color:#888;letter-spacing:.05em;margin-bottom:5px}
+#pdf-target .pt-bar-bg{height:12px;background:#F3F4F6;border-radius:6px;overflow:hidden;display:flex;margin-bottom:5px}
+#pdf-target .pt-bar-seg{height:12px}
+#pdf-target .pt-bar-legend{display:flex;gap:8px;flex-wrap:wrap}
+#pdf-target .pt-bl{display:flex;align-items:center;gap:3px;font-size:9px;color:#888}
+#pdf-target .pt-bl-dot{width:7px;height:7px;border-radius:2px}
+
+/* PDF 메시지 */
+#pdf-target .pt-msg{border-radius:10px;padding:10px 12px;margin-bottom:10px}
+#pdf-target .pt-msg .pm-badge{font-size:9px;font-weight:700;letter-spacing:.06em;margin-bottom:3px}
+#pdf-target .pt-msg .pm-title{font-size:13px;font-weight:700;margin-bottom:3px;line-height:1.3}
+#pdf-target .pt-msg .pm-body{font-size:10px;line-height:1.65;word-break:keep-all}
+#pdf-target .pt-msg.pm-warn{background:#FFF7ED}
+#pdf-target .pt-msg.pm-warn .pm-badge{color:#D97706}
+#pdf-target .pt-msg.pm-warn .pm-title{color:#92400E}
+#pdf-target .pt-msg.pm-warn .pm-body{color:#78350F}
+#pdf-target .pt-msg.pm-caution{background:#FEF9C3}
+#pdf-target .pt-msg.pm-caution .pm-badge{color:#854D0E}
+#pdf-target .pt-msg.pm-caution .pm-title{color:#713F12}
+#pdf-target .pt-msg.pm-caution .pm-body{color:#713F12}
+#pdf-target .pt-msg.pm-ok{background:#ECFDF5}
+#pdf-target .pt-msg.pm-ok .pm-badge{color:#065F46}
+#pdf-target .pt-msg.pm-ok .pm-title{color:#064E3B}
+#pdf-target .pt-msg.pm-ok .pm-body{color:#064E3B}
+
+/* PDF 전략 */
+#pdf-target .pt-strat-title{font-size:9px;font-weight:700;color:#888;letter-spacing:.06em;margin-bottom:6px}
+#pdf-target .pt-strat-list{display:flex;flex-direction:column;gap:4px}
+#pdf-target .pt-strat-item{display:flex;align-items:flex-start;gap:6px;background:#F8F8F8;border-radius:7px;padding:7px 9px}
+#pdf-target .pt-strat-num{width:16px;height:16px;border-radius:5px;background:#F59E0B;color:#fff;font-size:8px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+#pdf-target .pt-strat-text{font-size:10px;color:#333;line-height:1.5;word-break:keep-all}
+
+/* PDF 1년 환산 */
+#pdf-target .pt-year-title{font-size:9px;font-weight:700;color:#888;letter-spacing:.06em;margin-bottom:6px}
+#pdf-target .pt-ytable{width:100%;border-collapse:collapse;font-size:10px}
+#pdf-target .pt-ytable th{padding:6px 8px;background:#F8F8F8;color:#888;font-size:9px;font-weight:700;text-align:left}
+#pdf-target .pt-ytable th:first-child{border-radius:6px 0 0 6px}
+#pdf-target .pt-ytable th:last-child{border-radius:0 6px 6px 0}
+#pdf-target .pt-ytable td{padding:7px 8px;border-bottom:1px solid #F3F4F6;color:#333}
+#pdf-target .pt-ytable tr:last-child td{border-bottom:none}
+#pdf-target .pt-ytable tr.pt-my td{background:#FFF7ED;font-weight:700;color:#D97706}
+#pdf-target .pt-ytable tr.pt-my td:first-child{border-left:3px solid #F59E0B}
+
+/* PDF 푸터 */
+#pdf-target .pt-footer{border-top:1px solid #FEF3C7;padding-top:8px;text-align:center;font-size:9px;color:#ccc;margin-top:10px}
 </style>
 </head>
 <body>
@@ -85,27 +229,27 @@
   <div class="r-row">
     <div class="r-icon" style="background:#EFF6FF">😴</div>
     <div class="r-label"><div class="name">수면</div><div class="sub">밤잠 + 낮잠 포함</div></div>
-    <div class="r-input-wrap"><input class="r-input" type="number" min="0" max="24" step="0.5" value="" placeholder="0" id="i0" oninput="updateTotal()"><span class="r-unit">h</span></div>
+    <div class="r-input-wrap"><input class="r-input" type="number" min="0" max="24" step="0.5" placeholder="0" id="i0" oninput="updateTotal()"><span class="r-unit">h</span></div>
   </div>
   <div class="r-row">
     <div class="r-icon" style="background:#F0FDF4">🍚</div>
     <div class="r-label"><div class="name">식사</div><div class="sub">아침·점심·저녁 합산</div></div>
-    <div class="r-input-wrap"><input class="r-input" type="number" min="0" max="24" step="0.5" value="" placeholder="0" id="i1" oninput="updateTotal()"><span class="r-unit">h</span></div>
+    <div class="r-input-wrap"><input class="r-input" type="number" min="0" max="24" step="0.5" placeholder="0" id="i1" oninput="updateTotal()"><span class="r-unit">h</span></div>
   </div>
   <div class="r-row">
     <div class="r-icon" style="background:#F0FDF4">🚌</div>
     <div class="r-label"><div class="name">이동</div><div class="sub">통학·이동 시간 합산</div></div>
-    <div class="r-input-wrap"><input class="r-input" type="number" min="0" max="24" step="0.5" value="" placeholder="0" id="i2" oninput="updateTotal()"><span class="r-unit">h</span></div>
+    <div class="r-input-wrap"><input class="r-input" type="number" min="0" max="24" step="0.5" placeholder="0" id="i2" oninput="updateTotal()"><span class="r-unit">h</span></div>
   </div>
   <div class="r-row">
     <div class="r-icon" style="background:#EEF2FF">📚</div>
     <div class="r-label"><div class="name">수업·강의</div><div class="sub">오늘 실제 수업 시간</div></div>
-    <div class="r-input-wrap"><input class="r-input" type="number" min="0" max="24" step="0.5" value="" placeholder="0" id="i3" oninput="updateTotal()"><span class="r-unit">h</span></div>
+    <div class="r-input-wrap"><input class="r-input" type="number" min="0" max="24" step="0.5" placeholder="0" id="i3" oninput="updateTotal()"><span class="r-unit">h</span></div>
   </div>
   <div class="r-row">
     <div class="r-icon" style="background:#EEF2FF">✏️</div>
     <div class="r-label"><div class="name">공부·과제</div><div class="sub">수업 외 자습 시간</div></div>
-    <div class="r-input-wrap"><input class="r-input" type="number" min="0" max="24" step="0.5" value="" placeholder="0" id="i4" oninput="updateTotal()"><span class="r-unit">h</span></div>
+    <div class="r-input-wrap"><input class="r-input" type="number" min="0" max="24" step="0.5" placeholder="0" id="i4" oninput="updateTotal()"><span class="r-unit">h</span></div>
   </div>
 
   <div class="thief-section">
@@ -113,132 +257,449 @@
     <div class="r-row">
       <div class="r-icon" style="background:#FEF3C7">📱</div>
       <div class="r-label"><div class="name">스마트폰</div><div class="sub">스크린타임에서 확인!</div></div>
-      <div class="r-input-wrap"><input class="r-input" type="number" min="0" max="24" step="0.5" value="" placeholder="0" id="i5" oninput="updateTotal()"><span class="r-unit">h</span></div>
+      <div class="r-input-wrap"><input class="r-input" type="number" min="0" max="24" step="0.5" placeholder="0" id="i5" oninput="updateTotal()"><span class="r-unit">h</span></div>
     </div>
     <div class="r-row">
       <div class="r-icon" style="background:#FEF3C7">📺</div>
       <div class="r-label"><div class="name">유튜브·넷플릭스</div><div class="sub">시간 도둑 2호</div></div>
-      <div class="r-input-wrap"><input class="r-input" type="number" min="0" max="24" step="0.5" value="" placeholder="0" id="i6" oninput="updateTotal()"><span class="r-unit">h</span></div>
+      <div class="r-input-wrap"><input class="r-input" type="number" min="0" max="24" step="0.5" placeholder="0" id="i6" oninput="updateTotal()"><span class="r-unit">h</span></div>
     </div>
   </div>
 
   <div class="r-row">
     <div class="r-icon" style="background:#F0FDF4">🏃</div>
     <div class="r-label"><div class="name">운동</div><div class="sub">산책·헬스 합산</div></div>
-    <div class="r-input-wrap"><input class="r-input" type="number" min="0" max="24" step="0.5" value="" placeholder="0" id="i7" oninput="updateTotal()"><span class="r-unit">h</span></div>
+    <div class="r-input-wrap"><input class="r-input" type="number" min="0" max="24" step="0.5" placeholder="0" id="i7" oninput="updateTotal()"><span class="r-unit">h</span></div>
   </div>
   <div class="r-row">
     <div class="r-icon" style="background:#F9FAFB">☁️</div>
     <div class="r-label"><div class="name">멍때리기·휴식</div><div class="sub">그냥 쉰 시간</div></div>
-    <div class="r-input-wrap"><input class="r-input" type="number" min="0" max="24" step="0.5" value="" placeholder="0" id="i8" oninput="updateTotal()"><span class="r-unit">h</span></div>
+    <div class="r-input-wrap"><input class="r-input" type="number" min="0" max="24" step="0.5" placeholder="0" id="i8" oninput="updateTotal()"><span class="r-unit">h</span></div>
   </div>
   <div class="r-row">
     <div class="r-icon" style="background:#F9FAFB">💬</div>
     <div class="r-label"><div class="name">기타</div><div class="sub">약속·알바 등</div></div>
-    <div class="r-input-wrap"><input class="r-input" type="number" min="0" max="24" step="0.5" value="" placeholder="0" id="i9" oninput="updateTotal()"><span class="r-unit">h</span></div>
+    <div class="r-input-wrap"><input class="r-input" type="number" min="0" max="24" step="0.5" placeholder="0" id="i9" oninput="updateTotal()"><span class="r-unit">h</span></div>
   </div>
 
   <div class="total-disp">합계: <span id="total-disp">0</span> / 24시간</div>
-  <button class="calc-btn" onclick="showResult()">영수증 정산하기</button>
+  <button class="calc-btn" onclick="showResult()">영수증 정산하기 →</button>
 
+  <!-- 결과 -->
   <div class="result" id="result">
+
+    <!-- 도넛 차트 -->
+    <div class="chart-area">
+      <div class="donut-wrap">
+        <svg width="120" height="120" viewBox="0 0 120 120" id="donut-svg">
+          <circle cx="60" cy="60" r="48" fill="none" stroke="#F3F4F6" stroke-width="16"/>
+          <circle cx="60" cy="60" r="48" fill="none" stroke="#34D399" stroke-width="16" stroke-dasharray="0 302" stroke-linecap="round" transform="rotate(-90 60 60)" id="arc-g" style="transition:stroke-dasharray .6s ease"/>
+          <circle cx="60" cy="60" r="48" fill="none" stroke="#FBBF24" stroke-width="16" stroke-dasharray="0 302" stroke-linecap="round" transform="rotate(-90 60 60)" id="arc-t" style="transition:stroke-dasharray .6s ease;transition-delay:.15s"/>
+          <circle cx="60" cy="60" r="48" fill="none" stroke="#818CF8" stroke-width="16" stroke-dasharray="0 302" stroke-linecap="round" transform="rotate(-90 60 60)" id="arc-s" style="transition:stroke-dasharray .6s ease;transition-delay:.3s"/>
+        </svg>
+        <div class="donut-center">
+          <div class="dc-val" id="d-growth">0h</div>
+          <div class="dc-sub">성장 시간</div>
+        </div>
+      </div>
+      <div class="legend-list" id="legend-list"></div>
+    </div>
+
+    <!-- 통계 카드 -->
     <div class="stat-grid">
       <div class="stat-card sc-growth">
-        <div class="sc-label">성장 시간</div>
-        <div class="sc-val" id="r-growth">0<span style="font-size:14px">h</span></div>
+        <div class="sc-label">📈 성장 시간</div>
+        <div class="sc-val" id="r-growth">0<span style="font-size:13px">h</span></div>
         <div class="sc-sub">수업 + 공부 + 운동</div>
       </div>
       <div class="stat-card sc-thief">
-        <div class="sc-label">시간 도둑</div>
-        <div class="sc-val" id="r-thief">0<span style="font-size:14px">h</span></div>
-        <div class="sc-sub">폰 + 유튜브</div>
+        <div class="sc-label">⏰ 시간 도둑</div>
+        <div class="sc-val" id="r-thief">0<span style="font-size:13px">h</span></div>
+        <div class="sc-sub">폰 + 유튜브·넷플릭스</div>
       </div>
     </div>
 
-    <div class="bar-wrap">
-      <div class="bar-track">
-        <div class="bar-seg" id="bar-g" style="background:#34D399;width:0%"></div>
-        <div class="bar-seg" id="bar-t" style="background:#FBBF24;width:0%"></div>
-        <div class="bar-seg" id="bar-o" style="background:#E5E7EB;width:100%"></div>
-      </div>
-    </div>
-    <div class="bar-legend">
-      <div class="bl"><div class="bl-dot" style="background:#34D399"></div>성장</div>
-      <div class="bl"><div class="bl-dot" style="background:#FBBF24"></div>시간 도둑</div>
-      <div class="bl"><div class="bl-dot" style="background:#E5E7EB"></div>기타</div>
+    <!-- 개인화 메시지 -->
+    <div class="msg-box" id="msg-box">
+      <div class="msg-badge" id="msg-badge"></div>
+      <div class="msg-title" id="msg-title"></div>
+      <div class="msg-body" id="msg-body"></div>
     </div>
 
-    <div class="comment-box" id="r-comment-box">
-      <div class="cb-label" id="r-comment-label"></div>
-      <p id="r-comment"></p>
+    <!-- 실천 전략 -->
+    <div class="strategy-wrap">
+      <div class="strategy-title">🎯 지금 바로 실천할 전략</div>
+      <div class="strategy-list" id="strategy-list"></div>
     </div>
 
+    <!-- 1년 환산 -->
     <div class="year-section">
-      <div class="ys-title">시간 도둑 — 1년 환산표</div>
+      <div class="year-title">📅 시간 도둑 — 1년 환산표</div>
       <table class="year-table">
-        <thead><tr><th>하루 시간 도둑</th><th>1년이면</th><th>할 수 있는 것</th></tr></thead>
+        <thead><tr><th>하루 도둑 시간</th><th>1년이면</th><th>대신 할 수 있는 것</th></tr></thead>
         <tbody>
           <tr><td>1시간</td><td>365h</td><td>토익 기초 완성</td></tr>
           <tr><td>2시간</td><td>730h</td><td>자격증 2개 도전</td></tr>
           <tr><td>3시간</td><td>1,095h</td><td>토익 700점대 가능</td></tr>
           <tr><td>4시간 이상</td><td>1,460h+</td><td>전문 기술 하나 마스터</td></tr>
-          <tr class="my-row"><td id="my-h">내 시간</td><td id="my-year">-</td><td id="my-can">-</td></tr>
+          <tr class="my-row"><td id="my-h">내 기록</td><td id="my-year">-</td><td id="my-can">-</td></tr>
         </tbody>
       </table>
     </div>
 
-    <button class="retry-btn" onclick="restart()">다시 입력하기</button>
+    <div class="action-row">
+      <button class="retry-btn" onclick="restart()">🔄 다시 입력</button>
+      <button class="pdf-btn" onclick="downloadPDF()">
+        <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 16l-4-4m4 4l4-4m-4 4V4M4 20h16"/></svg>
+        PDF 저장
+      </button>
+    </div>
   </div>
 </div>
 
+<!-- 오버레이 -->
+<div class="overlay" id="overlay">
+  <div class="overlay-box">
+    <div class="spinner"></div>
+    <p>결과지를 PDF로<br>만들고 있어요 📄</p>
+  </div>
+</div>
+
+<!-- PDF 전용 숨김 레이아웃 -->
+<div id="pdf-target"></div>
+
 <script>
-function getV(){return[0,1,2,3,4,5,6,7,8,9].map(function(i){return parseFloat(document.getElementById('i'+i).value)||0});}
+/* ══════════════════════════════
+   데이터
+══════════════════════════════ */
+var CATS=[
+  {id:'i0',name:'수면',     color:'#93C5FD',emoji:'😴'},
+  {id:'i1',name:'식사',     color:'#6EE7B7',emoji:'🍚'},
+  {id:'i2',name:'이동',     color:'#A7F3D0',emoji:'🚌'},
+  {id:'i3',name:'수업',     color:'#818CF8',emoji:'📚'},
+  {id:'i4',name:'공부',     color:'#6366F1',emoji:'✏️'},
+  {id:'i5',name:'스마트폰', color:'#FBBF24',emoji:'📱'},
+  {id:'i6',name:'영상',     color:'#FCD34D',emoji:'📺'},
+  {id:'i7',name:'운동',     color:'#34D399',emoji:'🏃'},
+  {id:'i8',name:'휴식',     color:'#E5E7EB',emoji:'☁️'},
+  {id:'i9',name:'기타',     color:'#CBD5E1',emoji:'💬'},
+];
+
+/* 개인화 메시지 & 전략 생성 */
+function getPersonalMsg(thief, growth, sleep, v){
+  var yearH=Math.round(thief*365);
+  var thiefH=thief.toFixed(1);
+  var growH=growth.toFixed(1);
+
+  if(thief>=6){
+    return {
+      cls:'msg-warn', badge:'🚨 긴급 경보',
+      title:'하루의 '+Math.round(thief/24*100)+'%가 사라지고 있어요',
+      body:'하루 '+thiefH+'시간이 스마트폰·영상으로 빠져나가고 있어요. 1년이면 '+yearH+'시간 — 이 시간으로 토익+자격증+포트폴리오를 동시에 준비할 수 있어요. 오늘 딱 1시간만 줄이는 것부터 시작해봐요.',
+      strategies:[
+        '지금 바로 스마트폰 스크린타임 제한을 하루 '+Math.max(1,Math.round(thief/2))+'시간으로 설정하기',
+        '공부 시작 전 핸드폰을 다른 방에 두거나 서랍 속에 넣어두기',
+        '유튜브·넷플릭스는 "오늘 할 일 완료 후"라는 조건을 붙이기',
+        '포모도로 타이머(25분 집중 + 5분 휴식)로 집중 구간 만들기',
+      ]
+    };
+  } else if(thief>=4){
+    return {
+      cls:'msg-warn', badge:'⚠️ 시간 도둑 주의',
+      title:'1년이면 '+yearH+'시간… 아직 바꿀 수 있어요',
+      body:'하루 '+thiefH+'시간은 결코 적지 않아요. 취업 준비가 본격화되는 3학년 때 "그때 그 시간을 아꼈다면"이라고 후회하지 않으려면 지금 루틴을 바꿔야 해요. 작은 것 하나부터 시작해봐요.',
+      strategies:[
+        '스마트폰 사용 시간 목표를 오늘보다 30분 줄이기 (스크린타임 앱 활용)',
+        '공부 전 핸드폰 무음 + 뒤집어 놓기 루틴 만들기',
+        '하루 성장 시간 목표를 최소 '+Math.max(2, Math.ceil(growth)+1)+'시간으로 설정하기',
+        '자기 전 "오늘 도둑 시간 줄이기 성공 여부" 1줄 체크하기',
+      ]
+    };
+  } else if(thief>=2){
+    return {
+      cls:'msg-caution', badge:'💛 조금만 더!',
+      title:'방향은 맞아요, 지금이 터닝포인트예요',
+      body:'시간 도둑 '+thiefH+'시간 — 나쁘지 않아요. 여기서 1시간만 더 줄이면 성장 시간이 '+growH+'h → '+(growth+1).toFixed(1)+'h가 되고, 1년이면 365시간의 차이가 생겨요. 지금이 딱 변화의 타이밍이에요.',
+      strategies:[
+        '골든타임(오전 또는 집중이 잘 되는 시간대)에 가장 중요한 공부 먼저 배치하기',
+        '영상 시청은 하루 1회, 1시간 이내로 시간 제한 걸기',
+        '공부와 휴식을 명확히 분리 — "10분 봐야지"가 1시간이 되는 패턴 차단하기',
+        '주간 목표를 세우고 월요일 아침에 검토하는 루틴 만들기',
+      ]
+    };
+  } else {
+    return {
+      cls:'msg-ok', badge:'✅ 시간 관리 우수!',
+      title:'시간 도둑 '+thiefH+'h — 정말 잘 관리하고 있어요!',
+      body:'스마트폰·영상 시간이 '+thiefH+'시간으로 아주 잘 통제되고 있어요. 이제 성장 시간('+growH+'h)을 골든타임에 집중 배치하면 취업 경쟁력이 눈에 띄게 올라갈 거예요. 이 루틴, 계속 유지해봐요!',
+      strategies:[
+        '현재 루틴을 주간 플래너에 기록해 지속성 확보하기',
+        '성장 시간 '+growH+'h를 하루 '+(growth+0.5).toFixed(1)+'h로 조금씩 늘려가기',
+        '지금 이 습관을 주변 친구에게 공유해 서로 자극 주고받기',
+        '스크린타임 기록을 매주 확인해 현재 패턴을 유지하기',
+      ]
+    };
+  }
+}
+
+/* ══════════════════════════════
+   퀴즈 로직
+══════════════════════════════ */
+var savedV=null;
+
+function getV(){return CATS.map(function(c){return parseFloat(document.getElementById(c.id).value)||0});}
+
 function updateTotal(){
   var t=getV().reduce(function(a,b){return a+b},0);
-  document.getElementById('total-disp').textContent=t.toFixed(1);
+  var el=document.getElementById('total-disp');
+  el.textContent=t.toFixed(1);
+  el.className=t>24?'total-warn':'';
 }
+
 function showResult(){
   var v=getV();
   var total=v.reduce(function(a,b){return a+b},0);
+  if(total===0){alert('시간을 입력해주세요!');return;}
+
+  savedV=v;
   var growth=v[3]+v[4]+v[7];
   var thief=v[5]+v[6];
+  var sleep=v[0];
+
+  /* ─ 도넛 차트 ─ */
+  var circ=2*Math.PI*48; // 301.6
+  var gFrac=growth/24, tFrac=thief/24, sFrac=sleep/24;
+  var gDash=circ*gFrac, tDash=circ*tFrac, sDash=circ*sFrac;
+  var gOffset=0, tOffset=circ*gFrac, sOffset=circ*(gFrac+tFrac);
+
+  setTimeout(function(){
+    setArc('arc-g', gDash, circ-gDash, 0);
+    setArc('arc-t', tDash, circ-tDash, tOffset);
+    setArc('arc-s', sDash, circ-sDash, sOffset);
+  }, 100);
+
+  document.getElementById('d-growth').textContent=growth.toFixed(1)+'h';
+
+  /* ─ 범례 ─ */
+  var topCats=CATS.map(function(c,i){return{name:c.name,color:c.color,h:v[i]};})
+    .filter(function(x){return x.h>0;})
+    .sort(function(a,b){return b.h-a.h;})
+    .slice(0,5);
+  var legHtml='';
+  topCats.forEach(function(c){
+    var pct=Math.round(c.h/24*100);
+    legHtml+='<div class="leg-item">'
+      +'<div class="leg-dot" style="background:'+c.color+'"></div>'
+      +'<div class="leg-info"><div class="leg-name">'+c.name+'</div>'
+      +'<div class="leg-bar-bg"><div class="leg-bar-fill" style="width:'+pct+'%;background:'+c.color+'"></div></div></div>'
+      +'<div class="leg-h">'+c.h.toFixed(1)+'h</div>'
+      +'</div>';
+  });
+  document.getElementById('legend-list').innerHTML=legHtml;
+
+  /* ─ 통계 카드 ─ */
+  document.getElementById('r-growth').innerHTML=growth.toFixed(1)+'<span style="font-size:13px">h</span>';
+  document.getElementById('r-thief').innerHTML=thief.toFixed(1)+'<span style="font-size:13px">h</span>';
+
+  /* ─ 개인 메시지 ─ */
+  var msg=getPersonalMsg(thief,growth,sleep,v);
+  var mb=document.getElementById('msg-box');
+  mb.className='msg-box '+msg.cls;
+  document.getElementById('msg-badge').textContent=msg.badge;
+  document.getElementById('msg-title').textContent=msg.title;
+  document.getElementById('msg-body').textContent=msg.body;
+
+  /* ─ 전략 ─ */
+  var sHtml='';
+  msg.strategies.forEach(function(s,i){
+    sHtml+='<div class="strategy-item">'
+      +'<div class="strategy-num">'+(i+1)+'</div>'
+      +'<div class="strategy-text">'+s+'</div>'
+      +'</div>';
+  });
+  document.getElementById('strategy-list').innerHTML=sHtml;
+
+  /* ─ 1년 환산 ─ */
   var yearH=Math.round(thief*365);
-  document.getElementById('r-growth').innerHTML=growth.toFixed(1)+'<span style="font-size:14px">h</span>';
-  document.getElementById('r-thief').innerHTML=thief.toFixed(1)+'<span style="font-size:14px">h</span>';
-  var gp=total>0?Math.round(growth/24*100):0;
-  var tp=total>0?Math.round(thief/24*100):0;
-  var op=Math.max(0,100-gp-tp);
-  document.getElementById('bar-g').style.width=gp+'%';
-  document.getElementById('bar-t').style.width=tp+'%';
-  document.getElementById('bar-o').style.width=op+'%';
-  var cb=document.getElementById('r-comment-box');
-  var label=document.getElementById('r-comment-label');
-  var msg=document.getElementById('r-comment');
-  if(thief>=5){
-    cb.className='comment-box cb-warn';
-    label.textContent='시간 도둑 경보!';
-    msg.textContent='하루 '+thief.toFixed(1)+'시간이 스마트폰·유튜브로 빠져나가고 있어요. 1년이면 '+yearH+'시간 — 자격증 여러 개를 딸 수 있는 시간입니다. 딱 1시간만 줄여봐요.';
-  }else if(thief>=2){
-    cb.className='comment-box cb-warn';
-    label.textContent='시간 도둑 주의!';
-    msg.textContent='하루 '+thief.toFixed(1)+'시간, 나쁘지 않지만 조금만 줄이면 큰 차이가 납니다. 골든타임에 가장 중요한 일을 먼저 배치해보세요.';
-  }else{
-    cb.className='comment-box cb-ok';
-    label.textContent='시간 관리 우수!';
-    msg.textContent='스마트폰·유튜브 시간이 '+thief.toFixed(1)+'시간으로 잘 관리되고 있어요. 이제 성장 시간('+growth.toFixed(1)+'h)을 골든타임에 집중 배치해보세요.';
-  }
-  var myCan=yearH>=1460?'전문 기술 하나 마스터':yearH>=1095?'토익 700점대 + 자격증':yearH>=730?'자격증 2개 도전 가능':yearH>=365?'토익 기초 완성 가능':'관리 잘 되고 있어요';
+  var myCan=yearH>=1460?'전문 기술 하나 마스터':yearH>=1095?'토익 700점대 + 자격증 도전':yearH>=730?'자격증 2개 도전 가능':yearH>=365?'토익 기초 완성 가능':'관리 매우 잘 됨 👍';
   document.getElementById('my-h').textContent='나: '+thief.toFixed(1)+'h';
-  document.getElementById('my-year').textContent=yearH+'h';
+  document.getElementById('my-year').textContent=yearH.toLocaleString()+'h';
   document.getElementById('my-can').textContent=myCan;
+
   document.getElementById('result').classList.add('show');
-  document.getElementById('result').scrollIntoView({behavior:'smooth',block:'start'});
+  setTimeout(function(){document.getElementById('result').scrollIntoView({behavior:'smooth',block:'start'});},100);
 }
+
+function setArc(id, dash, gap, offset){
+  var el=document.getElementById(id);
+  el.setAttribute('stroke-dasharray', dash+' '+gap);
+  el.setAttribute('stroke-dashoffset', -offset);
+}
+
 function restart(){
-  [0,1,2,3,4,5,6,7,8,9].forEach(function(i){document.getElementById('i'+i).value='';});
+  CATS.forEach(function(c){document.getElementById(c.id).value='';});
   document.getElementById('total-disp').textContent='0';
   document.getElementById('result').classList.remove('show');
   window.scrollTo({top:0,behavior:'smooth'});
+}
+
+/* ══════════════════════════════
+   PDF 다운로드
+══════════════════════════════ */
+function getTodayStr(){
+  var d=new Date();
+  return d.getFullYear()+'년 '+(d.getMonth()+1)+'월 '+d.getDate()+'일';
+}
+
+function buildDonutSVG(gFrac, tFrac, sFrac, size){
+  var r=size*0.4; var cx=size/2; var cy=size/2; var sw=size*0.133;
+  var circ=2*Math.PI*r;
+  var gD=circ*gFrac, tD=circ*tFrac, sD=circ*sFrac;
+  function arc(color, dash, gap, offset){
+    return '<circle cx="'+cx+'" cy="'+cy+'" r="'+r+'" fill="none" stroke="'+color+'" stroke-width="'+sw+'" stroke-dasharray="'+dash+' '+gap+'" stroke-dashoffset="'+(-(offset))+'" transform="rotate(-90 '+cx+' '+cy+')" stroke-linecap="round"/>';
+  }
+  return '<svg width="'+size+'" height="'+size+'" viewBox="0 0 '+size+' '+size+'">'
+    +'<circle cx="'+cx+'" cy="'+cy+'" r="'+r+'" fill="none" stroke="#F3F4F6" stroke-width="'+sw+'"/>'
+    +arc('#34D399', gD, circ-gD, 0)
+    +arc('#FBBF24', tD, circ-tD, circ*gFrac)
+    +arc('#93C5FD', sD, circ-sD, circ*(gFrac+tFrac))
+    +'</svg>';
+}
+
+function buildPdfTarget(){
+  if(!savedV) return;
+  var v=savedV;
+  var growth=v[3]+v[4]+v[7];
+  var thief=v[5]+v[6];
+  var sleep=v[0];
+  var yearH=Math.round(thief*365);
+  var msg=getPersonalMsg(thief,growth,sleep,v);
+
+  var gFrac=growth/24, tFrac=thief/24, sFrac=sleep/24;
+  var donutSVG=buildDonutSVG(gFrac, tFrac, sFrac, 110);
+
+  /* 범례 */
+  var legItems=CATS.map(function(c,i){return{name:c.name,color:c.color,h:v[i]};})
+    .filter(function(x){return x.h>0;}).sort(function(a,b){return b.h-a.h;}).slice(0,6);
+  var legHtml=legItems.map(function(c){
+    return '<div class="pt-leg"><div class="pt-leg-dot" style="background:'+c.color+'"></div>'+c.name+' '+c.h.toFixed(1)+'h</div>';
+  }).join('');
+
+  /* 바 차트 */
+  var gPct=Math.round(gFrac*100), tPct=Math.round(tFrac*100), sPct=Math.round(sFrac*100);
+  var oPct=Math.max(0,100-gPct-tPct-sPct);
+  var barSegs='<div class="pt-bar-seg" style="width:'+gPct+'%;background:#34D399"></div>'
+    +'<div class="pt-bar-seg" style="width:'+tPct+'%;background:#FBBF24"></div>'
+    +'<div class="pt-bar-seg" style="width:'+sPct+'%;background:#93C5FD"></div>'
+    +'<div class="pt-bar-seg" style="width:'+oPct+'%;background:#E5E7EB"></div>';
+
+  /* 전략 */
+  var stratHtml=msg.strategies.map(function(s,i){
+    return '<div class="pt-strat-item"><div class="pt-strat-num">'+(i+1)+'</div><div class="pt-strat-text">'+s+'</div></div>';
+  }).join('');
+
+  /* 1년 환산 */
+  var myCan=yearH>=1460?'전문 기술 하나 마스터':yearH>=1095?'토익 700점대+자격증':yearH>=730?'자격증 2개 가능':yearH>=365?'토익 기초 완성':'관리 매우 우수 👍';
+
+  var msgCls=msg.cls==='msg-warn'?'pm-warn':msg.cls==='msg-caution'?'pm-caution':'pm-ok';
+
+  document.getElementById('pdf-target').innerHTML=
+  '<div class="pt-wrap">'
+  /* 헤더 */
+  +'<div class="pt-header">'
+    +'<div class="pt-header-left">'
+      +'<div class="pt-badge">DoDream 3주차 활동</div>'
+      +'<div class="pt-title">나의 24시간 타임 영수증</div>'
+      +'<div class="pt-date">'+getTodayStr()+' 작성 완료</div>'
+    +'</div>'
+    +'<div class="pt-header-right">'
+      +'<div class="pt-score">'+thief.toFixed(1)+'h</div>'
+      +'<div class="pt-score-sub">오늘의 시간 도둑</div>'
+    +'</div>'
+  +'</div>'
+
+  /* 2열 레이아웃 */
+  +'<div class="pt-cols">'
+    /* 왼쪽: 도넛 + 범례 + 바 */
+    +'<div class="pt-col-l">'
+      +'<div class="pt-chart-wrap">'+donutSVG+'</div>'
+      +'<div class="pt-legend">'+legHtml+'</div>'
+      +'<div class="pt-bar-title">24시간 분배 현황</div>'
+      +'<div class="pt-bar-bg">'+barSegs+'</div>'
+      +'<div class="pt-bar-legend">'
+        +'<div class="pt-bl"><div class="pt-bl-dot" style="background:#34D399"></div>성장</div>'
+        +'<div class="pt-bl"><div class="pt-bl-dot" style="background:#FBBF24"></div>도둑</div>'
+        +'<div class="pt-bl"><div class="pt-bl-dot" style="background:#93C5FD"></div>수면</div>'
+        +'<div class="pt-bl"><div class="pt-bl-dot" style="background:#E5E7EB"></div>기타</div>'
+      +'</div>'
+    +'</div>'
+    /* 오른쪽: 통계 + 1년 환산 */
+    +'<div class="pt-col-r">'
+      +'<div class="pt-stat-row">'
+        +'<div class="pt-stat ps-g"><div class="ps-label">📈 성장 시간</div><div class="ps-val">'+growth.toFixed(1)+'<span style="font-size:11px">h</span></div><div class="ps-sub">수업+공부+운동</div></div>'
+        +'<div class="pt-stat ps-t"><div class="ps-label">⏰ 시간 도둑</div><div class="ps-val">'+thief.toFixed(1)+'<span style="font-size:11px">h</span></div><div class="ps-sub">폰+유튜브</div></div>'
+      +'</div>'
+      +'<div class="pt-year-title">📅 시간 도둑 1년 환산</div>'
+      +'<table class="pt-ytable">'
+        +'<thead><tr><th>하루</th><th>1년</th><th>가능한 것</th></tr></thead>'
+        +'<tbody>'
+          +'<tr><td>1h</td><td>365h</td><td>토익 기초</td></tr>'
+          +'<tr><td>2h</td><td>730h</td><td>자격증 2개</td></tr>'
+          +'<tr><td>3h</td><td>1,095h</td><td>토익 700점대</td></tr>'
+          +'<tr><td>4h+</td><td>1,460h+</td><td>전문기술 마스터</td></tr>'
+          +'<tr class="pt-my"><td>나: '+thief.toFixed(1)+'h</td><td>'+yearH.toLocaleString()+'h</td><td>'+myCan+'</td></tr>'
+        +'</tbody>'
+      +'</table>'
+    +'</div>'
+  +'</div>'
+
+  /* 개인 메시지 */
+  +'<div class="pt-msg '+msgCls+'">'
+    +'<div class="pm-badge">'+msg.badge+'</div>'
+    +'<div class="pm-title">'+msg.title+'</div>'
+    +'<div class="pm-body">'+msg.body+'</div>'
+  +'</div>'
+
+  /* 실천 전략 */
+  +'<div class="pt-strat-title">🎯 지금 바로 실천할 전략</div>'
+  +'<div class="pt-strat-list">'+stratHtml+'</div>'
+
+  +'<div class="pt-footer">DoDream 진로취업 프로그램 · 24시간 타임 영수증 결과지</div>'
+  +'</div>';
+}
+
+async function downloadPDF(){
+  if(!savedV){return;}
+  document.getElementById('overlay').classList.add('show');
+  buildPdfTarget();
+  await new Promise(function(r){setTimeout(r,800);});
+  try{
+    var target=document.getElementById('pdf-target');
+    var canvas=await html2canvas(target,{
+      scale:2, useCORS:true, backgroundColor:'#ffffff',
+      logging:false, width:520, windowWidth:520
+    });
+    var imgData=canvas.toDataURL('image/jpeg',0.95);
+    var {jsPDF}=window.jspdf;
+    var doc=new jsPDF({unit:'mm',format:'a4',orientation:'portrait'});
+    var pageW=doc.internal.pageSize.getWidth();
+    var pageH=doc.internal.pageSize.getHeight();
+    var margin=12;
+    var maxW=pageW-(margin*2);
+    var maxH=pageH-(margin*2);
+    var imgW=maxW;
+    var imgH=canvas.height*(imgW/canvas.width);
+    if(imgH>maxH){imgH=maxH; imgW=canvas.width*(imgH/canvas.height);}
+    var offsetX=margin+(maxW-imgW)/2;
+    doc.addImage(imgData,'JPEG',offsetX,margin,imgW,imgH);
+    var fileName='타임영수증_'+getTodayStr().replace(/년\s/,'').replace(/월\s/,'-').replace('일','')+'.pdf';
+    doc.save(fileName);
+  }catch(e){
+    alert('PDF 생성 오류: '+e.message);
+    console.error(e);
+  }finally{
+    document.getElementById('overlay').classList.remove('show');
+  }
 }
 </script>
 </body>
